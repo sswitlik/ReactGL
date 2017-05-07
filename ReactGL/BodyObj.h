@@ -11,14 +11,21 @@ public:
 	virtual void Draw();			//OpenGL drawing
 	void setType(int type);
 	void setMaterial(float, float);
+	virtual void update();
 
 	//test 0.2
 	void testset();
 	void rd();
 	float angle;
+	
 	//protected:
 	rp3d::RigidBody *body;
 	rp3d::ProxyShape *proxyShape;
 	rp3d::CollisionShape *shape;
 	//rp3d::Material& material;
+
+	//rotation angles
+	float x_yaw;
+	float y_pitch;
+	float z_roll;
 };

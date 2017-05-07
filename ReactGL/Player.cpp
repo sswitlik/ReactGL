@@ -3,9 +3,10 @@
 #include <GL\freeglut.h>
 #include "Game.h"
 #include "Arrow.h"
+#include "maths.h"
 
 #define RAD  0.01745329
-#define PI_2 1.57079632679
+//#define PI_2 1.57079632679
 #define PIx2 6.28318530717
 
 Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::Vector3 shapeData)
@@ -26,6 +27,10 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	rp3d::Material& material = body->getMaterial();
 	material.setBounciness(rp3d::decimal(0));
 	material.setFrictionCoefficient(rp3d::decimal(1));
+
+	//COLLISION FILTERING
+	proxyShape->setCollisionCategoryBits(PLAYERcat);
+	proxyShape->setCollideWithMaskBits(MAPcat);
 
 	//ROTATION
 	Yaw = 0; Roll = 0; Pitch = 0;
@@ -101,23 +106,23 @@ void Player::unset_control(int control)
 	}
 }
 
-void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q)
-{
-	float sp = -2.0f * (q.y*q.z - q.w*q.x);
-
-	if (sp == 1.0f)
-	{
-		*Pitch = PI_2 * sp;
-		*Yaw = atan2f(-q.x*q.z + q.w*q.y, 0.5f - q.y*q.y - q.z*q.z);
-		*Roll = 0.0f;
-	}
-	else
-	{
-		*Pitch = asinf(sp);
-		*Yaw = atan2f(q.x*q.z + q.w*q.y, 0.5f - q.x*q.x - q.y*q.y);
-		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
-	}
-}
+//void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q)
+//{
+//	float sp = -2.0f * (q.y*q.z - q.w*q.x);
+//
+//	if (sp == 1.0f)
+//	{
+//		*Pitch = PI_2 * sp;
+//		*Yaw = atan2f(-q.x*q.z + q.w*q.y, 0.5f - q.y*q.y - q.z*q.z);
+//		*Roll = 0.0f;
+//	}
+//	else
+//	{
+//		*Pitch = asinf(sp);
+//		*Yaw = atan2f(q.x*q.z + q.w*q.y, 0.5f - q.x*q.x - q.y*q.y);
+//		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
+//	}
+//}
 
 void Player::unrotate()
 {
@@ -401,7 +406,7 @@ Arrow * Player::test_shoot()
 {
 	rp3d::Transform t = body->getTransform();
 	rp3d::Vector3 initPosition = t.getPosition();
-	initPosition.setAllValues(initPosition.x + cam.lx*0.5, initPosition.y + cam.ly*0.5 - 0.3, initPosition.z + cam.lz*0.5);
+	initPosition.setAllValues(initPosition.x + cam.lx, initPosition.y + cam.ly*0.5 - 0.3, initPosition.z + cam.lz);
 
 	rp3d::Vector3 newposition(initPosition.x, initPosition.y + 0.5, initPosition.z);
 
@@ -412,14 +417,15 @@ Arrow * Player::test_shoot()
 
 	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.1, 1, 10);
 
-	rp3d::Vector3 CenterMass(0,0.9,0);;
-	//bullet->body->setCenterOfMassLocal(CenterMass);
+	rp3d::Vector3 CenterMass(0,0.2,0);;
+	bullet->body->setCenterOfMassLocal(CenterMass);
 	
 	rp3d::Material& material = bullet->body->getMaterial();
-	material.setFrictionCoefficient(0.4);
-	bullet->body->setLinearDamping(0.6);
+	//material.setFrictionCoefficient(0.4);
+	bullet->body->setAngularDamping(0.6);
+	material.setRollingResistance(0.1);
 
-	float power = 5000;
+	float power = 8000;
 	rp3d::Vector3 force(cam.lx * power, cam.ly * power, cam.lz * power);
 	bullet->body->applyForceToCenterOfMass(force);
 

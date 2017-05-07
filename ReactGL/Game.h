@@ -3,6 +3,7 @@
 #include <vector>
 #include "BodyObj.h"
 #include "Player.h"
+#include "GameEventListener.h"
 
 class Game
 {
@@ -17,7 +18,7 @@ public:
 	//PLAYER
 	Player * getplayer();
 	void testshoot();
-
+	void testarrowrotate();
 	//nowe szesciany
 	int quantity;
 	std::vector <BodyObj *> objs;
@@ -36,4 +37,6 @@ public:
 	//PLAYER
 	Player *player;
 
+	//CONTACT
+	GameEventListener *listener;
 };

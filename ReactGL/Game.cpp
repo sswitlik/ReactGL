@@ -2,6 +2,9 @@
 #include "Game.h"
 #include <GL/freeglut.h>
 #include "Arrow.h"
+#include "maths.h"
+
+//#define PI_2 1.57079632679
 
 Game::Game()
 {
@@ -19,6 +22,10 @@ Game::Game()
 	rp3d::Vector3 shapeData(0.125, 0.5, 0.125);
 
 	player = new Player(World, initPosition, initOrientation, shapeData);
+
+	//CONTACT 
+	listener = new GameEventListener(World);
+	World->setEventListener(listener);
 }
 
 
@@ -75,6 +82,10 @@ void Game::Draw_1(float m[16])
 void Game::Update()
 {
 	player->update();
+	for (int i = 0; i < quantity; i++)
+	{
+		objs[i]->update();
+	}
 
 	///TIME UPDATE
 	if (previousFrameTime == 0)
@@ -144,4 +155,57 @@ void Game::testshoot()
 	quantity++;
 	Arrow *b = player->test_shoot();
 	objs.push_back(b);
+}
+
+//void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q)
+//{
+//	float sp = -2.0f * (q.y*q.z - q.w*q.x);
+//
+//	if (sp == 1.0f)
+//	{
+//		*Pitch = PI_2 * sp;
+//		*Yaw = atan2f(-q.x*q.z + q.w*q.y, 0.5f - q.y*q.y - q.z*q.z);
+//		*Roll = 0.0f;
+//	}
+//	else
+//	{
+//		*Pitch = asinf(sp);
+//		*Yaw = atan2f(q.x*q.z + q.w*q.y, 0.5f - q.x*q.x - q.y*q.y);
+//		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
+//	}
+//}
+
+void Game::testarrowrotate()
+{
+	if (quantity == 0)
+		return;
+
+	//rp3d::Vector3 pow(0, 3000, 0);
+	//objs[0]->body->applyForceToCenterOfMass(pow);
+	for (int i = 0; i < quantity; i++)
+	{
+		objs[i]->body->enableGravity(false);
+		objs[i]->body->setLinearDamping(0.9);
+
+		rp3d::Transform t = objs[i]->body->getTransform();
+		rp3d::Quaternion q = t.getOrientation();
+		rp3d::Matrix3x3 m = q.getMatrix();
+
+		float x;
+		float y;
+		float z;
+
+		QuaternionO2IToEulerAngles(&x, &y, &z, q);
+		rp3d::Quaternion *newq;
+		if (y > 0)
+			newq = new rp3d::Quaternion(x, y - 0.25, z);
+		else
+			newq = new rp3d::Quaternion(x, y + 0.25, z);
+
+		newq->setAllValues(newq->y, newq->x, newq->z, newq->w);
+		t.setOrientation(*newq);
+		objs[i]->body->setTransform(t);
+
+		delete newq;
+	}
 }

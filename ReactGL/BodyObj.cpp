@@ -2,6 +2,8 @@
 #include "GL/freeglut.h"
 #include "BodyObj.h"
 #include <cmath>
+#include "maths.h"
+
 #define RAD  0.01745329
 
 BodyObj::BodyObj()
@@ -23,6 +25,10 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	angle = 0;
 
 	proxyShape->setUserData(this);
+
+	//COLLISION FILTERING
+	proxyShape->setCollisionCategoryBits(MAPcat);
+	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat);
 }
 
 
@@ -109,4 +115,9 @@ void BodyObj::testset()	//test 0.2
 	body->enableGravity(false);
 
 	body->setAngularDamping(0.99);
+}
+
+void BodyObj::update()
+{
+
 }

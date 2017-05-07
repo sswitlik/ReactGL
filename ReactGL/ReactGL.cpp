@@ -133,6 +133,8 @@ void OnKeyDown(unsigned char key, int x, int y)
 		game.plus();
 	if (key == 'z')
 		game.testshoot();
+	if (key == 'c')
+		game.testarrowrotate();
 }
 
 void OnKeyPress(unsigned char key, int x, int y) {

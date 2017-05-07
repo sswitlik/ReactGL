@@ -29,7 +29,7 @@ public:
 	void unrotate();
 	void stop();
 	void update();
-private:
+//private:
 	//ROTATION
 	float Yaw;
 	float Pitch;
