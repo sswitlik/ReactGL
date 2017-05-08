@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "GameEventListener.h"
 #include "BodyObj.h"
+#include "maths.h"
+#include "Arrow.h"
 
 GameEventListener::GameEventListener(rp3d::DynamicsWorld *World)
 {
@@ -12,7 +14,7 @@ GameEventListener::~GameEventListener()
 {
 }
 
-void GameEventListener::beginContact(const rp3d::ContactPointInfo &contact)
+void GameEventListener::newContact(const rp3d::ContactPointInfo &contact)
 {
 	std::vector<const rp3d::ContactManifold*> manifolds;
 
@@ -25,10 +27,20 @@ void GameEventListener::beginContact(const rp3d::ContactPointInfo &contact)
 		const rp3d::ContactManifold* manifold = *it;
 
 		rp3d::ProxyShape *ps1 = manifold->getShape1();
-		BodyObj *body1 = (BodyObj *) ps1->getUserData();
+		if (ps1->getCollisionCategoryBits() == ARROWcat)
+		{
+			Arrow *body1 = (Arrow *)ps1->getUserData();
+			body1->collided = true;
+			body1->color.setAllValues(0.5, 1, 0);
+		}
 
 		rp3d::ProxyShape *ps2 = manifold->getShape2();
-		BodyObj *body2 = (BodyObj *) ps2->getUserData();
+		if (ps2->getCollisionCategoryBits() == ARROWcat)
+		{
+			Arrow *body2 = (Arrow *)ps2->getUserData();
+			body2->collided = true; 
+			body2->color.setAllValues(0.5, 1, 0);
+		}
 
 		/*
 		// For each contact point of the manifold 

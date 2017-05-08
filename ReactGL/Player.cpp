@@ -306,7 +306,6 @@ void Player::serve_controls()
 	if (vel.y < -0.1)
 		jump_border = 0.1;
 
-	printf("%f\n", vel.y);
 
 	if (jump && abs(vel.y) < jump_border)
 	{
@@ -425,7 +424,7 @@ Arrow * Player::test_shoot()
 	bullet->body->setAngularDamping(0.6);
 	material.setRollingResistance(0.1);
 
-	float power = 8000;
+	float power = 4000;
 	rp3d::Vector3 force(cam.lx * power, cam.ly * power, cam.lz * power);
 	bullet->body->applyForceToCenterOfMass(force);
 

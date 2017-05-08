@@ -135,6 +135,8 @@ void OnKeyDown(unsigned char key, int x, int y)
 		game.testshoot();
 	if (key == 'c')
 		game.testarrowrotate();
+	if (key == 'q')
+		game.Update();
 }
 
 void OnKeyPress(unsigned char key, int x, int y) {

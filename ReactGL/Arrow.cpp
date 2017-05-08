@@ -22,12 +22,15 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	
 	//COLLISION FILTERING
 	proxyShape->setCollisionCategoryBits(ARROWcat);
-	proxyShape->setCollideWithMaskBits(MAPcat | ARROWcat);
+	proxyShape->setCollideWithMaskBits(MAPcat);
 
-	time = 0;
 
 	//COLOR
 	color.setAllValues(1, 0.5, 0);
+
+	time = 0;
+	collided = false;
+	antivibr = false;
 }
 
 
@@ -44,9 +47,9 @@ void Arrow::Draw()
 	glPushMatrix();
 		glMultMatrixf(matrix);
 		glColor3f(color.x, color.y, color.z);
-		glScalef(0.1, 1, 0.1);
+		glScalef(0.02, 1, 0.02);
 		glutSolidCube(1);
-		glColor3f(0, 0, 0);
+		glColor3f(0.5,0.5, 0.5);
 		glutWireCube(1);
 	glPopMatrix();
 }
@@ -71,34 +74,63 @@ void Arrow::Draw()
 
 void Arrow::update()
 {
-	time++;
-	if (time < 15)
+	if (time < 25 && !collided) 
+	{
+		time++;
 		return;
+	}
 
-	rp3d::Transform t = body->getTransform();
-	rp3d::Vector3 speed = body->getLinearVelocity();
-	rp3d::Quaternion q = t.getOrientation();
-	//rp3d::Matrix3x3 m = q.getMatrix();
+	if (collided)	
+	{
+		rp3d::Vector3 stop(0, 0, 0);
+		body->setAngularVelocity(stop);
+		body->setLinearVelocity(stop);
+		body->enableGravity(false);
+	}
+	else
+	{
+		//static bool antivibr = false;
 
-	float x;
-	float y;
-	float z;
+		rp3d::Transform t = body->getTransform();
+		rp3d::Vector3 speed = body->getLinearVelocity();
+		rp3d::Quaternion q = t.getOrientation();
+		//rp3d::Matrix3x3 m = q.getMatrix();
 
-	QuaternionO2IToEulerAngles(&x, &y, &z, q);
+		printf("%f %f %f\n", speed.x, speed.y, speed.z);
 
-	//y from speed
-	speed.normalize();
-	y = acos(speed.y);
+		double x;
+		double y;
+		double z;
 
-	rp3d::Quaternion newq(x,y,z);
-	//if (y > 0)
-	//	newq = new rp3d::Quaternion(x, y - 0.25, z);
-	//else
-	//	newq = new rp3d::Quaternion(x, y + 0.25, z);
+		
+		QuaternionO2IToEulerAngles(&x, &y, &z, q);
 
-	newq.setAllValues(newq.y, newq.x, newq.z, newq.w);
+		if (antivibr)
+		{
+			x += PI;
+			z += PI;
+		}
 
-	t.setOrientation(newq);
-	body->setTransform(t);
-	
+		printf("%f %f %f\n", x, y, z);
+
+		//y from speed
+		speed.normalize();
+		y = acos(speed.y);
+
+		rp3d::Vector3 angsp = body->getAngularVelocity();
+
+		//printf("%f %f %f\n", angsp.x, angsp.y, angsp.z);
+
+		rp3d::Quaternion newq(x, y, z);
+
+		printf("%f %f %f\n", x, y, z);
+		printf("%f %f %f %f\n\n", newq.y, newq.x, newq.z, newq.w);
+		newq.setAllValues(newq.y, newq.x, newq.z, newq.w);
+
+		t.setOrientation(newq);
+		body->setTransform(t);
+
+		if (speed.y < 0)
+			antivibr = true;
+	}
 }

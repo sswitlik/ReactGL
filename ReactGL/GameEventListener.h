@@ -7,7 +7,7 @@ public:
 	GameEventListener(rp3d::DynamicsWorld *World);
 	~GameEventListener();
 
-	void beginContact(const rp3d::ContactPointInfo &contact);
+	void newContact(const rp3d::ContactPointInfo &contact);
 
 private:
 	rp3d::DynamicsWorld *world;

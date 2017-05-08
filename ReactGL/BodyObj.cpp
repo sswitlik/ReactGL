@@ -28,7 +28,7 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 
 	//COLLISION FILTERING
 	proxyShape->setCollisionCategoryBits(MAPcat);
-	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat);
+	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat);
 }
 
 
