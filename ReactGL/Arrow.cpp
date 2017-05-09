@@ -24,7 +24,6 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	proxyShape->setCollisionCategoryBits(ARROWcat);
 	proxyShape->setCollideWithMaskBits(MAPcat);
 
-
 	//COLOR
 	color.setAllValues(1, 0.5, 0);
 

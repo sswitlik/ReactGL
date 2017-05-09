@@ -7,7 +7,8 @@
 enum Category {
 	PLAYERcat = 0x0001,
 	MAPcat = 0x0002,
-	ARROWcat = 0x0004
+	ARROWcat = 0x0004,
+	EFFECTcat = 0x008
 };
 
 void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q);

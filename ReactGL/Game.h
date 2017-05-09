@@ -19,9 +19,10 @@ public:
 	Player * getplayer();
 	void testshoot();
 	void testarrowrotate();
-	//nowe szesciany
+	//OBIEKTY GRY
 	int quantity;
 	std::vector <BodyObj *> objs;
+	std::vector <BodyObj *> effects;
 	//test 0.2
 	void rd();
 	//private:

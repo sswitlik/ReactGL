@@ -66,9 +66,9 @@ void Display()
 	glutWireCube(1);
 	glPopMatrix();
 
-	for (int i = 0; i < game.quantity; i++)
+	for (auto *i : game.objs)
 	{
-		game.objs[i]->Draw();
+		i->Draw();
 	}
 
 

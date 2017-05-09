@@ -24,7 +24,7 @@ Game::Game()
 	player = new Player(World, initPosition, initOrientation, shapeData);
 
 	//CONTACT 
-	listener = new GameEventListener(World);
+	listener = new GameEventListener(World,objs);
 	World->setEventListener(listener);
 }
 
@@ -82,9 +82,9 @@ void Game::Draw_1(float m[16])
 void Game::Update()
 {
 	player->update();
-	for (int i = 0; i < quantity; i++)
+	for (auto *i : objs)
 	{
-		objs[i]->update();
+		i->update();
 	}
 
 	///TIME UPDATE
@@ -177,17 +177,17 @@ void Game::testshoot()
 
 void Game::testarrowrotate()
 {
-	if (quantity == 0)
+	if (!objs.size())
 		return;
 
 	//rp3d::Vector3 pow(0, 3000, 0);
 	//objs[0]->body->applyForceToCenterOfMass(pow);
-	for (int i = 0; i < quantity; i++)
+	for (auto *i : objs)
 	{
-		objs[i]->body->enableGravity(false);
-		objs[i]->body->setLinearDamping(0.9);
+		i->body->enableGravity(false);
+		i->body->setLinearDamping(0.9);
 
-		rp3d::Transform t = objs[i]->body->getTransform();
+		rp3d::Transform t = i->body->getTransform();
 		rp3d::Quaternion q = t.getOrientation();
 		rp3d::Matrix3x3 m = q.getMatrix();
 
@@ -204,7 +204,7 @@ void Game::testarrowrotate()
 
 		newq->setAllValues(newq->y, newq->x, newq->z, newq->w);
 		t.setOrientation(*newq);
-		objs[i]->body->setTransform(t);
+		i->body->setTransform(t);
 
 		delete newq;
 	}

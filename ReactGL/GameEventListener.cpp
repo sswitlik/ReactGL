@@ -4,9 +4,22 @@
 #include "maths.h"
 #include "Arrow.h"
 
-GameEventListener::GameEventListener(rp3d::DynamicsWorld *World)
+GameEventListener::GameEventListener(rp3d::DynamicsWorld *World, std::vector <BodyObj *> &effects)
 {
 	world = World;
+
+	//test
+	rp3d::Vector3 initPosition;
+	rp3d::Quaternion initOrientation;
+	rp3d::Vector3 shapeData;
+
+	initPosition.setAllValues(0.0, 15.0, 0.0);
+	initOrientation = rp3d::Quaternion::identity();
+	shapeData.setAllValues(0.5, 0.5, 0.5);
+	BodyObj *obj = new BodyObj(world, initPosition, initOrientation, shapeData, 2);
+	obj->setMaterial(0.8, 0.2);
+
+	effects.push_back(obj);
 }
 
 
