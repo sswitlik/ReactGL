@@ -71,8 +71,34 @@ void Display()
 		i->Draw();
 	}
 
+	//2d
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0, 800, 600, 0.0, -1.0, 10.0);
+	glMatrixMode(GL_MODELVIEW);
+	//glPushMatrix();        ----Not sure if I need this
+	glLoadIdentity();
+	glDisable(GL_CULL_FACE);
 
+	glClear(GL_DEPTH_BUFFER_BIT);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glBegin(GL_QUADS);
+	glColor4f(1.0f, 1.0f, 1.0, 0.5);
+	glVertex2f(390.0, 290.0);
+	glVertex2f(410.0, 290.0);
+	glVertex2f(410.0, 310.0);
+	glVertex2f(390.0, 310.0);
+	glEnd();
+
+	// Making sure we can render 3d again
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	//
 
 	glFlush();			// skierowanie poleceñ do wykonania
 	glutSwapBuffers();	// zamiana buforów koloru
