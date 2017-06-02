@@ -56,15 +56,16 @@ void Display()
 	glPopMatrix();
 
 	////PLAYER
-	glPushMatrix();
-	player->Draw(matrix);
-	glMultMatrixf(matrix);
-	glScalef(0.25, 1, 0.25);
-	glColor3f(0, 0, 0.5);
-	//glutSolidCube(1);
-	glColor3f(1, 1, 1);
-	glutWireCube(1);
-	glPopMatrix();
+	//glPushMatrix();
+	//player->Draw(matrix);
+	//glMultMatrixf(matrix);
+	//glScalef(0.25, 1, 0.25);
+	//glColor3f(0, 0, 0.5);
+	////glutSolidCube(1);
+	//glColor3f(1, 1, 1);
+	//glutWireCube(1);
+	//glPopMatrix();
+	player->Draw();
 
 	for (auto *i : game.objs)
 	{
@@ -77,8 +78,8 @@ void Display()
 	glLoadIdentity();
 	glOrtho(0.0, 800, 600, 0.0, -1.0, 10.0);
 	glMatrixMode(GL_MODELVIEW);
-	//glPushMatrix();        ----Not sure if I need this
 	glLoadIdentity();
+
 	glDisable(GL_CULL_FACE);
 
 	glClear(GL_DEPTH_BUFFER_BIT);

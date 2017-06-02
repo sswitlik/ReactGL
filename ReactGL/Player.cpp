@@ -370,14 +370,47 @@ void Player::serve_controls()
 	//prev = vel.y;
 }
 
-void Player::Draw(float m[16])
+void Player::Draw()
 {
 	rp3d::Transform transform = body->getTransform();
 	float matrix[16];
 	transform.getOpenGLMatrix(matrix);
 
-	for (int i = 0; i < 16; i++)
-		m[i] = matrix[i];
+	glPushMatrix();
+		glMultMatrixf(matrix);
+		glScalef(0.25, 1, 0.25);
+		glColor3f(0, 0, 0.5);
+		//glutSolidCube(1);
+		glColor3f(1, 1, 1);
+		glutWireCube(1);
+	glPopMatrix();
+
+	//glMatrixMode(GL_PROJECTION);
+	//glPushMatrix();
+	//	glLoadIdentity();
+	//	glOrtho(0.0, 800, 600, 0.0, -1.0, 10.0);
+	//	glMatrixMode(GL_MODELVIEW);
+	//	glLoadIdentity();
+
+	//	glDisable(GL_CULL_FACE);
+
+	//	glClear(GL_DEPTH_BUFFER_BIT);
+
+	//	glEnable(GL_BLEND);
+	//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//	glBegin(GL_QUADS);
+	//	glColor4f(1.0f, 1.0f, 1.0, 0.5);
+	//	glVertex2f(390.0, 290.0);
+	//	glVertex2f(410.0, 290.0);
+	//	glVertex2f(410.0, 310.0);
+	//	glVertex2f(390.0, 310.0);
+	//	glEnd();
+
+	//	// Making sure we can render 3d again
+	//	glMatrixMode(GL_PROJECTION);
+	//glPopMatrix();
+	//glMatrixMode(GL_MODELVIEW);
 }
 
 void Player::look_vertical(float angle)
@@ -405,7 +438,7 @@ Arrow * Player::test_shoot()
 {
 	rp3d::Transform t = body->getTransform();
 	rp3d::Vector3 initPosition = t.getPosition();
-	initPosition.setAllValues(initPosition.x + cam.lx, initPosition.y + cam.ly*0.5 - 0.3, initPosition.z + cam.lz);
+	initPosition.setAllValues(initPosition.x , initPosition.y -0.5, initPosition.z );
 
 	rp3d::Vector3 newposition(initPosition.x, initPosition.y + 0.5, initPosition.z);
 
@@ -414,7 +447,7 @@ Arrow * Player::test_shoot()
 	//Capsule
 	const rp3d::Vector2 shapeData(0.1, 0.5);
 
-	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.1, 1, 10);
+	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.1, 0.5, 10);
 
 	rp3d::Vector3 CenterMass(0,0.2,0);;
 	bullet->body->setCenterOfMassLocal(CenterMass);
@@ -424,7 +457,7 @@ Arrow * Player::test_shoot()
 	bullet->body->setAngularDamping(0.6);
 	material.setRollingResistance(0.1);
 
-	float power = 4000;
+	float power = 20000;
 	rp3d::Vector3 force(cam.lx * power, cam.ly * power, cam.lz * power);
 	bullet->body->applyForceToCenterOfMass(force);
 

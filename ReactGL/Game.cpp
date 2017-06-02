@@ -24,7 +24,7 @@ Game::Game()
 	player = new Player(World, initPosition, initOrientation, shapeData);
 
 	//CONTACT 
-	listener = new GameEventListener(World,objs);
+	listener = new GameEventListener(World,&effects);
 	World->setEventListener(listener);
 }
 

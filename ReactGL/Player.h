@@ -21,7 +21,7 @@ public:
 	void rotate2(Direction dir, float angle);
 	void look_vertical(float angle);
 	Arrow * test_shoot();
-	void Draw(float m[16]);
+	void Draw();
 
 	//void set();
 	Camera cam;
