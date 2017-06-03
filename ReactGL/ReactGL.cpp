@@ -15,7 +15,8 @@ Player *player;
 int mx, my;
 //Keyboard
 bool keystate[256];
-
+//Screen
+int screenHeight = 600, screenWidth = 800;
 
 void Display()
 {
@@ -72,34 +73,31 @@ void Display()
 		i->Draw();
 	}
 
-	//2d
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0, 800, 600, 0.0, -1.0, 10.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	#pragma region 2D
+	{
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho(0.0, 800, 600, 0.0, -1.0, 10.0);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 
-	glDisable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);
 
-	glClear(GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glBegin(GL_QUADS);
-	glColor4f(1.0f, 1.0f, 1.0, 0.5);
-	glVertex2f(390.0, 290.0);
-	glVertex2f(410.0, 290.0);
-	glVertex2f(410.0, 310.0);
-	glVertex2f(390.0, 310.0);
-	glEnd();
+		//DRAW 2d HERE
+		player->Drawsight(screenWidth / 2, screenHeight / 2);
+		player->DrawShootPower(screenWidth / 2, screenHeight);
 
-	// Making sure we can render 3d again
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	//
+		//
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+	}
 
 	glFlush();			// skierowanie poleceñ do wykonania
 	glutSwapBuffers();	// zamiana buforów koloru
@@ -148,6 +146,9 @@ void OnTimer(int id)
 
 	if (keystate[' '])
 		player->set_control(4);
+
+	if (keystate[0])			//LPP
+		player->set_control(5);
 }
 
 void OnKeyDown(unsigned char key, int x, int y)
@@ -215,6 +216,19 @@ void Idle()
 
 void MouseButton(int button, int state, int x, int y)
 {
+	Player *player = game.getplayer();
+	if (button == GLUT_LEFT_BUTTON)
+	{
+		if (state == GLUT_DOWN)
+			keystate[0] = true;
+		else
+		{
+			player->unset_control(5);
+			keystate[0] = false;
+			game.testshoot();
+		}
+	}
+	
 
 }
 
@@ -224,11 +238,11 @@ void MousePassiveMotion(int x, int y)
 	Player *player = game.getplayer();
 
 	//CAMERA ROTATION
-	if (x > 600 || x < 200 || y > 450 || y < 150)
+	if (x > screenWidth-200 || x < 200 || y > screenHeight -150 || y < 150)
 	{
 		glutWarpPointer(400, 300);
-		mx = 400;
-		my = 300;
+		mx = screenWidth/2;
+		my = screenHeight/2;
 		return;
 	}
 
@@ -245,6 +259,12 @@ void MousePassiveMotion(int x, int y)
 
 void MouseMotion(int x, int y)
 {
+	
+
+
+
+
+
 	MousePassiveMotion(x, y);
 	glutPostRedisplay();
 }
@@ -258,7 +278,7 @@ int main(int argc, char * argv[])
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(screenWidth, screenHeight);
 	glutInitWindowPosition(5, 5);
 	glutCreateWindow("LOL");
 	glutSetCursor(GLUT_CURSOR_NONE);

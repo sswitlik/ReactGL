@@ -22,6 +22,8 @@ public:
 	void look_vertical(float angle);
 	Arrow * test_shoot();
 	void Draw();
+	void Drawsight(int xcentr, int ycentr);
+	void DrawShootPower(int xcentr, int ysize);
 
 	//void set();
 	Camera cam;
@@ -42,12 +44,19 @@ public:
 	bool d;
 	bool jump;
 	float jump_border;
+	bool shoot;
+	int nextShotPower;
+
 	//PHYSICS
 	rp3d::RigidBody *body;
 	rp3d::ProxyShape *proxyShape;
 	rp3d::BoxShape *shape;
 
 	rp3d::DynamicsWorld *world;
+
+	//STATS
+	float accuracy;
+	int shootSpeed;
 };
 
 

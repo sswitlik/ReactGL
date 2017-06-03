@@ -53,29 +53,11 @@ void Arrow::Draw()
 	glPopMatrix();
 }
 
-//void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q)
-//{
-//	float sp = -2.0f * (q.y*q.z - q.w*q.x);
-//
-//	if (sp == 1.0f)
-//	{
-//		*Pitch = PI_2 * sp;
-//		*Yaw = atan2f(-q.x*q.z + q.w*q.y, 0.5f - q.y*q.y - q.z*q.z);
-//		*Roll = 0.0f;
-//	}
-//	else
-//	{
-//		*Pitch = asinf(sp);
-//		*Yaw = atan2f(q.x*q.z + q.w*q.y, 0.5f - q.x*q.x - q.y*q.y);
-//		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
-//	}
-//}
-
 void Arrow::update()
 {
 	if (time < 25 && !collided) 
 	{
-		time++;
+		time++;		//allow collision after 25
 		return;
 	}
 
@@ -88,13 +70,10 @@ void Arrow::update()
 	}
 	else
 	{
-		//static bool antivibr = false;
-
 		rp3d::Transform t = body->getTransform();
 		rp3d::Vector3 speed = body->getLinearVelocity();
 		rp3d::Quaternion q = t.getOrientation();
-		//rp3d::Matrix3x3 m = q.getMatrix();
-
+	
 		printf("%f %f %f\n", speed.x, speed.y, speed.z);
 
 		double x;
@@ -104,7 +83,7 @@ void Arrow::update()
 		
 		QuaternionO2IToEulerAngles(&x, &y, &z, q);
 
-		if (antivibr)
+		if (antivibr)	//if falling
 		{
 			x += PI;
 			z += PI;
@@ -116,14 +95,10 @@ void Arrow::update()
 		speed.normalize();
 		y = acos(speed.y);
 
-		rp3d::Vector3 angsp = body->getAngularVelocity();
-
-		//printf("%f %f %f\n", angsp.x, angsp.y, angsp.z);
+		rp3d::Vector3 angsp = body->getAngularVelocity();	//angle speed
 
 		rp3d::Quaternion newq(x, y, z);
 
-		printf("%f %f %f\n", x, y, z);
-		printf("%f %f %f %f\n\n", newq.y, newq.x, newq.z, newq.w);
 		newq.setAllValues(newq.y, newq.x, newq.z, newq.w);
 
 		t.setOrientation(newq);

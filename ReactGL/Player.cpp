@@ -45,11 +45,18 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	d = false;
 	jump = false;
 	jump_border = 0.1;
+	shoot = false;
+	nextShotPower = 0;
+
+	//STATS
+	accuracy = 20;
+	shootSpeed = 140;
 }
 
 
 Player::~Player()
 {
+	delete shape;
 }
 
 void Player::update()
@@ -81,6 +88,9 @@ void Player::set_control(int control)
 	case 4:
 		jump = 1;
 		break;
+	case 5:
+		shoot = 1;
+		break;
 	}
 }
 
@@ -103,26 +113,11 @@ void Player::unset_control(int control)
 	case 4:
 		jump = 0;
 		break;
+	case 5:
+		shoot = 0;
+		break;
 	}
 }
-
-//void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q)
-//{
-//	float sp = -2.0f * (q.y*q.z - q.w*q.x);
-//
-//	if (sp == 1.0f)
-//	{
-//		*Pitch = PI_2 * sp;
-//		*Yaw = atan2f(-q.x*q.z + q.w*q.y, 0.5f - q.y*q.y - q.z*q.z);
-//		*Roll = 0.0f;
-//	}
-//	else
-//	{
-//		*Pitch = asinf(sp);
-//		*Yaw = atan2f(q.x*q.z + q.w*q.y, 0.5f - q.x*q.x - q.y*q.y);
-//		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
-//	}
-//}
 
 void Player::unrotate()
 {
@@ -303,71 +298,83 @@ void Player::serve_controls()
 	//get velocity
 	rp3d::Vector3 vel = body->getLinearVelocity();
 
-	if (vel.y < -0.1)
-		jump_border = 0.1;
-
-
-	if (jump && abs(vel.y) < jump_border)
+	#pragma region JUMP
 	{
-		jump_border = 0.01;
-		vel.y += 4;
-		rp3d::Vector3 force(vel.x, vel.y, vel.z);
-		body->setLinearVelocity(force);
-	}
+		if (vel.y < -0.1)
+			jump_border = 0.1;
 
-
-	rp3d::Transform trans = body->getTransform();
-	rp3d::Quaternion orient = trans.getOrientation();
-
-	float x = 0;
-	float y = 0;
-	float z = 0;
-
-	float speed = 5;
-
-	if (w ^ s)	//XOR
-	{
-		if (w)
+		if (jump && abs(vel.y) < jump_border)
 		{
-			x = sin(Yaw)*speed;
-			z = cos(Yaw)*speed;
-		}
-		if (s)
-		{
-			x = -sin(Yaw)*speed;
-			z = -cos(Yaw)*speed;
+			jump_border = 0.01;
+			vel.y += 4;
+			rp3d::Vector3 force(vel.x, vel.y, vel.z);
+			body->setLinearVelocity(force);
 		}
 	}
 
-	if (a ^ d)	//XOR
+	#pragma region MOVE
 	{
-		if (a)
+		rp3d::Transform trans = body->getTransform();
+		rp3d::Quaternion orient = trans.getOrientation();
+
+		float x = 0;
+		float y = 0;
+		float z = 0;
+
+		float speed = 5;
+
+		if (w ^ s)	//XOR
 		{
-			x += sin(Yaw + PI_2)*speed;
-			z += cos(Yaw + PI_2)*speed;
+			if (w)
+			{
+				x = sin(Yaw)*speed;
+				z = cos(Yaw)*speed;
+			}
+			if (s)
+			{
+				x = -sin(Yaw)*speed;
+				z = -cos(Yaw)*speed;
+			}
 		}
-		if (d)
+
+		if (a ^ d)	//XOR
 		{
-			x += -sin(Yaw + PI_2)*speed;
-			z += -cos(Yaw + PI_2)*speed;
+			if (a)
+			{
+				x += sin(Yaw + PI_2)*speed;
+				z += cos(Yaw + PI_2)*speed;
+			}
+			if (d)
+			{
+				x += -sin(Yaw + PI_2)*speed;
+				z += -cos(Yaw + PI_2)*speed;
+			}
+		}
+
+		float new_x = x;
+		float new_z = z;
+		float new_y = y + vel.y;
+
+		rp3d::Vector2 max_speed(new_x, new_z);
+		if (max_speed.length() > 5)
+		{
+			max_speed.normalize();
+			max_speed *= 5;
+
+		}
+		rp3d::Vector3 new_vel(max_speed.x, new_y, max_speed.y);
+		body->setLinearVelocity(new_vel);
+	}
+	
+	#pragma region SHOOT
+	{
+		if (shoot)
+		{
+			if (nextShotPower < 20000)
+				nextShotPower += shootSpeed;
 		}
 	}
 
-	float new_x = x;
-	float new_z = z;
-	float new_y = y + vel.y;
-
-	rp3d::Vector2 max_speed(new_x, new_z);
-	if (max_speed.length() > 5)
-	{
-		max_speed.normalize();
-		max_speed *= 5;
-
-	}
-	rp3d::Vector3 new_vel(max_speed.x, new_y, max_speed.y);
-	body->setLinearVelocity(new_vel);
-
-	//prev = vel.y;
 }
 
 void Player::Draw()
@@ -384,33 +391,50 @@ void Player::Draw()
 		glColor3f(1, 1, 1);
 		glutWireCube(1);
 	glPopMatrix();
+}
 
-	//glMatrixMode(GL_PROJECTION);
-	//glPushMatrix();
-	//	glLoadIdentity();
-	//	glOrtho(0.0, 800, 600, 0.0, -1.0, 10.0);
-	//	glMatrixMode(GL_MODELVIEW);
-	//	glLoadIdentity();
+void Player::Drawsight(int xcentr, int ycentr)
+{
+	glPointSize(50);
+	float r = accuracy;
+	glColor4f(0.8f, 0.8f, 0.8, 0.3);
+	glBegin(GL_TRIANGLE_FAN);
+		glVertex2f(xcentr, ycentr);
+		int Np = 48;
+		for (int i = 0; i <= Np; ++i) {
+			float x = sin(2.0f * PI * ((float)i / Np));
+			float y = cos(2.0f * PI * ((float)i / Np));
+			glVertex2f(xcentr+x*r, ycentr+y*r);
 
-	//	glDisable(GL_CULL_FACE);
+		}
+	glEnd();
 
-	//	glClear(GL_DEPTH_BUFFER_BIT);
+	glColor4f(0.8f, 0.8f, 0.8f, 0.8);
+	glBegin(GL_LINES);
+		glVertex2f(xcentr - 50, ycentr);
+		glVertex2f(xcentr + 50, ycentr);
+		glVertex2f(xcentr, ycentr - 50);
+		glVertex2f(xcentr, ycentr + 50);
+	glEnd();
+}
 
-	//	glEnable(GL_BLEND);
-	//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+void Player::DrawShootPower(int xcentr, int ysize)
+{
+	glColor4f(0.8f, 0.8f, 0.8f, 0.8);
+	glBegin(GL_QUAD_STRIP);
+		glVertex2f(xcentr - 100, ysize - 50);
+		glVertex2f(xcentr - 100, ysize - 60);
 
-	//	glBegin(GL_QUADS);
-	//	glColor4f(1.0f, 1.0f, 1.0, 0.5);
-	//	glVertex2f(390.0, 290.0);
-	//	glVertex2f(410.0, 290.0);
-	//	glVertex2f(410.0, 310.0);
-	//	glVertex2f(390.0, 310.0);
-	//	glEnd();
-
-	//	// Making sure we can render 3d again
-	//	glMatrixMode(GL_PROJECTION);
-	//glPopMatrix();
-	//glMatrixMode(GL_MODELVIEW);
+		glVertex2f(xcentr - 100 + nextShotPower/100, ysize - 50);
+		glVertex2f(xcentr - 100 + nextShotPower/100, ysize - 60);
+		
+		//for (int i = 0; i < nextShotPower / 100; i+=10)
+		//{
+		//	glVertex2f(xcentr - 100 + i, ysize - 50);
+		//	glVertex2f(xcentr - 100 + i, ysize - 60);
+		//	
+		//}
+	glEnd();
 }
 
 void Player::look_vertical(float angle)
@@ -447,7 +471,7 @@ Arrow * Player::test_shoot()
 	//Capsule
 	const rp3d::Vector2 shapeData(0.1, 0.5);
 
-	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.1, 0.5, 10);
+	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.05, 0.5, 10);
 
 	rp3d::Vector3 CenterMass(0,0.2,0);;
 	bullet->body->setCenterOfMassLocal(CenterMass);
@@ -457,9 +481,12 @@ Arrow * Player::test_shoot()
 	bullet->body->setAngularDamping(0.6);
 	material.setRollingResistance(0.1);
 
-	float power = 20000;
+	float power = nextShotPower;
 	rp3d::Vector3 force(cam.lx * power, cam.ly * power, cam.lz * power);
 	bullet->body->applyForceToCenterOfMass(force);
+
+	//after shoot power to zero
+	nextShotPower = 0;
 
 	return bullet;
 }

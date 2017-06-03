@@ -81,7 +81,6 @@ void Game::Draw_1(float m[16])
 
 void Game::Update()
 {
-	player->update();
 	for (auto *i : objs)
 	{
 		i->update();
@@ -112,6 +111,7 @@ void Game::Update()
 
 		// Update the Dynamics world with a constant time step 
 		World->update(timeStep);
+		player->update();
 
 		// Decrease the accumulated time 
 		accumulator -= timeStep2;
@@ -156,24 +156,6 @@ void Game::testshoot()
 	Arrow *b = player->test_shoot();
 	objs.push_back(b);
 }
-
-//void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q)
-//{
-//	float sp = -2.0f * (q.y*q.z - q.w*q.x);
-//
-//	if (sp == 1.0f)
-//	{
-//		*Pitch = PI_2 * sp;
-//		*Yaw = atan2f(-q.x*q.z + q.w*q.y, 0.5f - q.y*q.y - q.z*q.z);
-//		*Roll = 0.0f;
-//	}
-//	else
-//	{
-//		*Pitch = asinf(sp);
-//		*Yaw = atan2f(q.x*q.z + q.w*q.y, 0.5f - q.x*q.x - q.y*q.y);
-//		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
-//	}
-//}
 
 void Game::testarrowrotate()
 {
