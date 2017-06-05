@@ -139,3 +139,10 @@ void Camera::sync(rp3d::Vector3 pos, float yaw, float roll, float pitch)
 	//ly = ty;
 	lz = tz;
 }
+
+rp3d::Vector3 Camera::getDirectionVector()
+{
+	rp3d::Vector3 result(lx, ly, lz);
+	result.normalize();
+	return result;
+}

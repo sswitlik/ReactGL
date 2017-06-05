@@ -21,6 +21,7 @@ public:
 	void rotate2(Direction dir, float angle);
 	void look_vertical(float angle);
 	Arrow * test_shoot();
+	void makeShoot();
 	void Draw();
 	void Drawsight(int xcentr, int ycentr);
 	void DrawShootPower(int xcentr, int ysize);

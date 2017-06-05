@@ -1,8 +1,14 @@
 #pragma once
 #include "reactphysics3d.h"
+#include <ctime>
+#include <cstdlib>
 
 #define PI_2 1.57079632679
 #define PI 3.14159265358979
+#define RAD  0.01745329
+//#define PI_2 1.57079632679
+#define PIx2 6.28318530717
+
 
 enum Category {
 	PLAYERcat = 0x0001,

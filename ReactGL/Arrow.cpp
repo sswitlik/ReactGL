@@ -53,6 +53,21 @@ void Arrow::Draw()
 	glPopMatrix();
 }
 
+//void Arrow::update()
+//{
+//	if (time < 25 && !collided)
+//	{
+//		time++;		//allow collision after 25
+//		return;
+//	}
+//	
+//		rp3d::Vector3 stop(0, 0, 0);
+//		body->setAngularVelocity(stop);
+//		body->setLinearVelocity(stop);
+//		body->enableGravity(false);
+//
+//}
+
 void Arrow::update()
 {
 	if (time < 25 && !collided) 

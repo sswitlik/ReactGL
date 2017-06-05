@@ -20,7 +20,7 @@ public:
 	void move(Direction dir);
 	void rotate(Direction dir, float angle);
 	void set();
-
+	rp3d::Vector3 getDirectionVector();
 	void sync(rp3d::Vector3 pos, float yaw, float roll, float pitch);
 	//private:
 	//rp3d::Quaternion orient;	//test 0.4

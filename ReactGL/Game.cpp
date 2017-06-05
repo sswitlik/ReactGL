@@ -32,7 +32,11 @@ Game::Game()
 Game::~Game()
 {
 	delete World;
-	//World->destroyRigidBody(floor);
+	delete floor;
+	for (auto *obj : objs)
+	{
+		delete obj;
+	}
 }
 
 
@@ -81,52 +85,43 @@ void Game::Draw_1(float m[16])
 
 void Game::Update()
 {
-	for (auto *i : objs)
-	{
-		i->update();
-	}
 
 	///TIME UPDATE
 	if (previousFrameTime == 0)
 		previousFrameTime = glutGet(GLUT_ELAPSED_TIME) - 1;
-	// Constant physics time step 
-	const float timeStep = 0.016;
+
+	
+	const float timeStep = 0.016;				// Constant physics time step 
 	const int timeStep2 = 16;
-	// Get the current system time 
-	unsigned int currentFrameTime = glutGet(GLUT_ELAPSED_TIME);
+	
+	unsigned int currentFrameTime = glutGet(GLUT_ELAPSED_TIME);			// Get the current system time 
+	
+	unsigned int deltaTime = currentFrameTime - previousFrameTime;		// Compute the time difference between the two frames 
+	
+	previousFrameTime = currentFrameTime;		// Update the previous time 
+	
+	accumulator += deltaTime;					// Add the time difference in the accumulator 
 
-	// Compute the time difference between the two frames 
-	unsigned int deltaTime = currentFrameTime - previousFrameTime;
-
-	// Update the previous time 
-	previousFrameTime = currentFrameTime;
-
-	// Add the time difference in the accumulator 
-	accumulator += deltaTime;
-
-	// While there is enough accumulated time to take 
-	// one or several physics steps 
-	int t1 = glutGet(GLUT_ELAPSED_TIME);
+	int t1 = glutGet(GLUT_ELAPSED_TIME);		// While there is enough accumulated time to take one or several physics steps 
 	while (accumulator >= timeStep2) {
 
-		// Update the Dynamics world with a constant time step 
-		World->update(timeStep);
+		World->update(timeStep);				// Update the Dynamics world with a constant time step 
+
 		player->update();
 
-		// Decrease the accumulated time 
-		accumulator -= timeStep2;
+		for (auto *i : objs)
+		{
+			i->update();
+		}
+		
+		accumulator -= timeStep2;				// Decrease the accumulated time 
 	}
-	int t2 = glutGet(GLUT_ELAPSED_TIME);
-	int j = 0;
 
-	/*for (int i=0;i<1;i++)
-	World->update(0.016);*/
+	int t2 = glutGet(GLUT_ELAPSED_TIME);
 }
 
 void Game::plus()
 {
-	quantity++;
-
 	rp3d::Vector3 initPosition;
 	rp3d::Quaternion initOrientation;
 	rp3d::Vector3 shapeData;
