@@ -8,7 +8,10 @@
 
 Game::Game()
 {
-	quantity = 0;
+
+	srand(time(NULL));
+
+	//quantity = 0;
 	//TIME
 	previousFrameTime = 0;
 	accumulator = 0;
@@ -126,7 +129,7 @@ void Game::plus()
 	rp3d::Quaternion initOrientation;
 	rp3d::Vector3 shapeData;
 
-	initPosition.setAllValues(0.0, 15.0, 0.0);
+	initPosition.setAllValues(0.0, 15.5, 0.0);
 	initOrientation = rp3d::Quaternion::identity();
 	shapeData.setAllValues(0.5, 0.5, 0.5);
 	BodyObj *obj = new BodyObj(this->World, initPosition, initOrientation, shapeData, 2);

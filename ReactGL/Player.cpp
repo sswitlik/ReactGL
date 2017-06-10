@@ -45,8 +45,8 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	nextShotPower = 0;
 
 	//STATS
-	accuracy = 5;
-	shootSpeed = 140;
+	accuracy = 1;
+	shootSpeed = 500;
 }
 
 Player::~Player()
@@ -390,8 +390,7 @@ void Player::Draw()
 
 void Player::Drawsight(int xcentr, int ycentr)
 {
-	glPointSize(50);
-	float r = accuracy;
+	float r = accuracy*2;
 	glColor4f(0.8f, 0.8f, 0.8, 0.3);
 	glBegin(GL_TRIANGLE_FAN);
 		glVertex2f(xcentr, ycentr);
@@ -457,60 +456,30 @@ Arrow * Player::test_shoot()
 {
 	rp3d::Transform t = body->getTransform();
 	rp3d::Vector3 initPosition = t.getPosition();
-	initPosition.setAllValues(initPosition.x , initPosition.y -0.5, initPosition.z );
-
-	rp3d::Vector3 newposition(initPosition.x, initPosition.y + 0.5, initPosition.z);
-
-	rp3d::Quaternion initOrientation(acos(cam.ly), Yaw, Pitch);
-	//rp3d::Quaternion initOrientation(Roll, cam.ly *PI_2, Pitch);
-	//Capsule
-	const rp3d::Vector2 shapeData(0.1, 0.5);
-
-	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.05, 0.5, 10);
-
-	rp3d::Vector3 CenterMass(0,0.2,0);;
-	bullet->body->setCenterOfMassLocal(CenterMass);
-	
-	rp3d::Material& material = bullet->body->getMaterial();
-	//material.setFrictionCoefficient(0.4);
-	bullet->body->setAngularDamping(0.6);
-	material.setRollingResistance(0.1);
-
-	float power = nextShotPower;
-	rp3d::Vector3 force(cam.lx * power, cam.ly * power, cam.lz * power);
-	bullet->body->applyForceToCenterOfMass(force);
-
-	//after shoot power to zero
-	nextShotPower = 0;
-
-	return bullet;
-}
-
-void Player::makeShoot()	//arrow *
-{
-	rp3d::Vector3 look = cam.getDirectionVector();
-	rp3d::Transform t = body->getTransform();
-	rp3d::Vector3 position = t.getPosition();
-
-	srand(time(NULL));
-
-	float angle1 = acos(cam.ly) + ((rand() % (int)accuracy));
-
-
-	rp3d::Quaternion initOrientation(acos(cam.ly), Yaw, Pitch);
-
-
-
-
-	/*
-	rp3d::Transform t = body->getTransform();
-	rp3d::Vector3 initPosition = t.getPosition();
 	initPosition.setAllValues(initPosition.x, initPosition.y - 0.5, initPosition.z);
 
 	rp3d::Vector3 newposition(initPosition.x, initPosition.y + 0.5, initPosition.z);
 
-	rp3d::Quaternion initOrientation(acos(cam.ly), Yaw, Pitch);
-	//rp3d::Quaternion initOrientation(Roll, cam.ly *PI_2, Pitch);
+	Camera shootDir(cam);
+	float randval = (float)((rand() % (2000 * (int)accuracy)) / 1000) - accuracy;
+	shootDir.rotate(DOWN, randval);
+	randval = (float)((rand() % (2000 * (int)accuracy)) / 1000) - accuracy;
+	shootDir.rotate(UP, randval);
+	randval = (float)((rand() % (2000 * (int)accuracy)) / 1000) - accuracy;
+	shootDir.rotate(LEFT, randval);
+	randval = (float)((rand() % (2000 * (int)accuracy)) / 1000) - accuracy;
+	shootDir.rotate(RIGHT, randval);
+	float angleX = shootDir.lx,
+		  angleY = shootDir.ly,
+		  angleZ = shootDir.lz;
+
+	float roll, yaw, pitch;
+	roll = acos(angleY);
+	yaw = atan2(angleX,angleZ);
+	pitch = Pitch;
+	rp3d::Quaternion initOrientation(roll,yaw,pitch);
+
+
 	//Capsule
 	const rp3d::Vector2 shapeData(0.1, 0.5);
 
@@ -525,14 +494,12 @@ void Player::makeShoot()	//arrow *
 	material.setRollingResistance(0.1);
 
 	float power = nextShotPower;
-	rp3d::Vector3 force(cam.lx * power, cam.ly * power, cam.lz * power);
+	rp3d::Vector3 force(angleX * power, angleY * power, angleZ * power);
 	bullet->body->applyForceToCenterOfMass(force);
 
 	//after shoot power to zero
 	nextShotPower = 0;
 
 	return bullet;
-	*/
 }
-
 

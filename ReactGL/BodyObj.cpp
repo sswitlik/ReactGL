@@ -24,6 +24,7 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	//test 0.2
 	angle = 0;
 
+	//pointer to this - using in collision detection
 	proxyShape->setUserData(this);
 
 	//COLLISION FILTERING
@@ -118,6 +119,11 @@ void BodyObj::testset()	//test 0.2
 }
 
 void BodyObj::update()
+{
+
+}
+
+void BodyObj::makeCollision(int collideWith)
 {
 
 }

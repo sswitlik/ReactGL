@@ -17,5 +17,6 @@ public:
 
 	void Draw();
 	void update();
+	void makeCollision(int collideWith);
 };
 

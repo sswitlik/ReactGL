@@ -12,7 +12,9 @@ public:
 	void setType(int type);
 	void setMaterial(float, float);
 	virtual void update();
-
+	virtual void makeCollision(int collideWith);
+	
+	
 	//test 0.2
 	void testset();
 	void rd();

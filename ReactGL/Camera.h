@@ -15,10 +15,12 @@ class Camera
 {
 public:
 	Camera();
+	Camera(const Camera & parent);
 	~Camera();
 
 	void move(Direction dir);
 	void rotate(Direction dir, float angle);
+	void rotateNonAbs(Direction dir, float angle);
 	void set();
 	rp3d::Vector3 getDirectionVector();
 	void sync(rp3d::Vector3 pos, float yaw, float roll, float pitch);

@@ -70,11 +70,12 @@ void Arrow::Draw()
 
 void Arrow::update()
 {
-	if (time < 25 && !collided) 
-	{
-		time++;		//allow collision after 25
-		return;
-	}
+	// bylo potrzebne przed collision filtering
+	//if (time < 25 && !collided) 
+	//{
+	//	time++;		//allow collision after 25
+	//	return;
+	//}
 
 	if (collided)	
 	{
@@ -89,7 +90,7 @@ void Arrow::update()
 		rp3d::Vector3 speed = body->getLinearVelocity();
 		rp3d::Quaternion q = t.getOrientation();
 	
-		printf("%f %f %f\n", speed.x, speed.y, speed.z);
+		//printf("%f %f %f\n", speed.x, speed.y, speed.z);
 
 		double x;
 		double y;
@@ -104,7 +105,7 @@ void Arrow::update()
 			z += PI;
 		}
 
-		printf("%f %f %f\n", x, y, z);
+		//printf("%f %f %f\n", x, y, z);
 
 		//y from speed
 		speed.normalize();
@@ -117,9 +118,15 @@ void Arrow::update()
 		newq.setAllValues(newq.y, newq.x, newq.z, newq.w);
 
 		t.setOrientation(newq);
-		body->setTransform(t);
+		body->setTransform(t);		//obrot wg predkowsci
 
 		if (speed.y < 0)
 			antivibr = true;
 	}
+}
+
+void Arrow::makeCollision(int collideWith)
+{
+	if (collideWith & MAPcat)
+		collided = true;
 }

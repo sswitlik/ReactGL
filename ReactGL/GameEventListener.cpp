@@ -34,20 +34,16 @@ void GameEventListener::newContact(const rp3d::ContactPointInfo &contact)
 		const rp3d::ContactManifold* manifold = *it;
 
 		rp3d::ProxyShape *ps1 = manifold->getShape1();
-		if (ps1->getCollisionCategoryBits() == ARROWcat)
-		{
-			Arrow *body1 = (Arrow *)ps1->getUserData();
-			body1->collided = true;
-			body1->color.setAllValues(0.5, 1, 0);
-		}
-
 		rp3d::ProxyShape *ps2 = manifold->getShape2();
-		if (ps2->getCollisionCategoryBits() == ARROWcat)
-		{
-			Arrow *body2 = (Arrow *)ps2->getUserData();
-			body2->collided = true; 
-			body2->color.setAllValues(0.5, 1, 0);
-		}
+
+		BodyObj *body1 = (BodyObj *)ps1->getUserData();
+		BodyObj *body2 = (BodyObj *)ps2->getUserData();
+
+		int arg = ps2->getCollideWithMaskBits();
+		if (body1)
+			body1->makeCollision(ps2->getCollideWithMaskBits());
+		if (body2)
+			body2->makeCollision(ps1->getCollideWithMaskBits());
 
 		/*
 		// For each contact point of the manifold 

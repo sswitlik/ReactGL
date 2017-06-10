@@ -20,6 +20,19 @@ Camera::Camera()
 	//orient.setAllValues(lx, ly, lz, 1);
 }
 
+Camera::Camera(const Camera &parent)
+{
+	x = parent.x;
+	y = parent.y;
+	z = parent.z;
+
+	lx = parent.lx;
+	ly = parent.ly;
+	lz = parent.lz;
+
+	angle_h = parent.angle_h;
+	angle_v = parent.angle_v;
+}
 
 Camera::~Camera()
 {
@@ -68,6 +81,49 @@ void Camera::move(Direction dir)
 void Camera::rotate(Direction dir, float angle)
 {
 	angle = abs(angle);
+	switch (dir)
+	{
+	case UP:
+		if (ly < 0.999)
+			angle_v = 0.01 * angle;
+		else
+			angle_v = 0;
+		break;
+	case DOWN:
+		if (ly > -0.999)
+			angle_v = -0.01 * angle;
+		else
+			angle_v = 0;
+		break;
+	case RIGHT:
+		angle_h = 0.01 * angle;
+		break;
+	case LEFT:
+		angle_h = -0.01 * angle;
+		break;
+	case FORWARD:
+		break;
+	case BACK:
+		break;
+	}
+
+	float dl = sqrt(pow(lx, 2) + pow(lz, 2));
+	float alfa = atan2(ly, dl);
+	ly = sin(alfa + angle_v);
+	dl = cos(alfa + angle_v);
+
+
+	//lz = cos(alfa + angle_v);
+
+	float beta = atan2(lz, lx);
+	lx = cos(beta + angle_h)*dl;
+	lz = sin(beta + angle_h)*dl;
+	angle_h = 0;
+	angle_v = 0;
+}
+
+void Camera::rotateNonAbs(Direction dir, float angle)
+{
 	switch (dir)
 	{
 	case UP:
