@@ -34,8 +34,6 @@ Game::Game()
 
 Game::~Game()
 {
-	delete World;
-	delete floor;
 	for (auto *obj : objs)
 	{
 		delete obj;
@@ -62,28 +60,31 @@ void Game::ExampleTestInit()
 	initPosition.setAllValues(0.0, 1, 0.0);
 	initOrientation = rp3d::Quaternion::identity();
 	shapeData.setAllValues(10, 0.5, 10);
-	floor = new BodyObj(this->World, initPosition, initOrientation, shapeData, 1);
+	auto floor = new BodyObj(this->World, initPosition, initOrientation, shapeData, 1);
 	floor->setType(1);
 	floor->setMaterial(0, 1);
+	floor->setCollisionCategory(MAPcat);
+	map.push_back(floor);
 
 	//OBJ
 	initPosition.setAllValues(0.0, 2.0, 0.0);
 	initOrientation = rp3d::Quaternion::identity();
 	shapeData.setAllValues(0.5, 0.5, 0.5);
-	obj1 = new BodyObj(this->World, initPosition, initOrientation, shapeData, 2);
+	auto obj1 = new BodyObj(this->World, initPosition, initOrientation, shapeData, 2);
 	obj1->setMaterial(0.3, 0.8);
 	obj1->setType(1);
-	//obj1->testset();
+	obj1->setCollisionCategory(MAPcat);
+	map.push_back(obj1);
 }
 
 void Game::Draw_floor(float m[16])
 {
-	floor->Draw(m);
+	//floor->Draw(m);
 }
 
 void Game::Draw_1(float m[16])
 {
-	obj1->Draw(m);
+	//obj1->Draw(m);
 }
 
 void Game::Update()
@@ -136,11 +137,6 @@ void Game::plus()
 	obj->setMaterial(0.8, 0.2);
 
 	objs.push_back(obj);
-}
-
-void Game::rd()
-{
-	obj1->rd();
 }
 
 Player * Game::getplayer()

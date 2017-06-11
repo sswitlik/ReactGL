@@ -31,31 +31,6 @@ void Display()
 	player->cam.set();
 	float matrix[16];
 
-
-	//FLOOR
-	glPushMatrix();
-	matrix[16];
-	game.Draw_floor(matrix);
-	glMultMatrixf(matrix);
-	glScalef(20, 1, 20);
-	glColor3f(0.5, 0, 0);
-	glutSolidCube(1);
-	glColor3f(0, 0, 0);
-	glutWireCube(1);
-	glPopMatrix();
-
-	//OBJ
-	glPushMatrix();
-	matrix[16];
-	game.Draw_1(matrix);
-	glMultMatrixf(matrix);
-	//glScalef(20, 1, 20);
-	glColor3f(0, 0, 0.5);
-	glutSolidCube(1);
-	glColor3f(0, 0, 0);
-	glutWireCube(1);
-	glPopMatrix();
-
 	////PLAYER
 	//glPushMatrix();
 	//player->Draw(matrix);
@@ -66,7 +41,12 @@ void Display()
 	//glColor3f(1, 1, 1);
 	//glutWireCube(1);
 	//glPopMatrix();
-	player->Draw();
+	//player->Draw();
+
+	for (auto *i : game.map)
+	{
+		i->Draw();
+	}
 
 	for (auto *i : game.objs)
 	{

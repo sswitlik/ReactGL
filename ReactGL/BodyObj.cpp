@@ -22,14 +22,17 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	proxyShape = body->addCollisionShape(shape, transform2, mass);
 
 	//test 0.2
-	angle = 0;
+	//angle = 0;
 
 	//pointer to this - using in collision detection
 	proxyShape->setUserData(this);
 
 	//COLLISION FILTERING
-	proxyShape->setCollisionCategoryBits(MAPcat);
-	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat);
+	proxyShape->setCollisionCategoryBits(FREEcat);
+	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat);
+
+	//DRAWING
+	model.setAllValues(shapeData.x*2, shapeData.y * 2, shapeData.z * 2);
 }
 
 
@@ -56,11 +59,27 @@ void BodyObj::Draw()
 
 	glPushMatrix();
 	glMultMatrixf(matrix);
+	glScalef(model.x, model.y, model.z);
 	glColor3f(0, 0.5, 0.5);
 	glutSolidCube(1);
 	glColor3f(0, 0, 0);
 	glutWireCube(1);
 	glPopMatrix();
+}
+
+void BodyObj::setCollisionCategory(Category cat)
+{
+	proxyShape->setCollisionCategoryBits(cat);
+	switch (cat)
+	{
+	case MAPcat:
+		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat);
+		break;
+	case ARROWcat:
+		proxyShape->setCollideWithMaskBits(MAPcat | ARROWcat | FREEcat);
+		break;
+
+	}
 }
 
 void BodyObj::setType(int type)
@@ -79,43 +98,6 @@ void BodyObj::setMaterial(float bounce, float friction)
 	material.setBounciness(rp3d::decimal(bounce));
 	material.setFrictionCoefficient(rp3d::decimal(friction));
 	body->setLinearDamping(0.8);
-}
-
-void BodyObj::rd()	//test 0.2
-{
-	angle += 10;
-	rp3d::Transform trans = body->getTransform();
-	rp3d::Quaternion orient = trans.getOrientation();
-
-	rp3d::Matrix3x3 m = orient.getMatrix();
-
-	m[0][0] = cos(angle * RAD);
-	m[0][2] = sin(angle * RAD);
-	m[2][0] = -sin(angle * RAD);
-	m[2][2] = cos(angle * RAD);
-
-	rp3d::Quaternion neworient(m);
-
-	trans.setOrientation(neworient);
-
-	body->setTransform(trans);
-	// Apply a force to the center of the body 
-	//body->applyForceToCenterOfMass(force);
-	//body->applyTorque(force);
-	//body->setAngularVelocity(force);
-}
-//
-//void BodyObj::obrot()	//test 0.2
-//{
-//	rp3d::Vector3 force(0.0, 5.0, 0.0);
-//	body->setAngularVelocity(force);
-//}
-
-void BodyObj::testset()	//test 0.2
-{
-	body->enableGravity(false);
-
-	body->setAngularDamping(0.99);
 }
 
 void BodyObj::update()

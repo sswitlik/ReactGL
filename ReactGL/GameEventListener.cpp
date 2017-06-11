@@ -41,9 +41,9 @@ void GameEventListener::newContact(const rp3d::ContactPointInfo &contact)
 
 		int arg = ps2->getCollideWithMaskBits();
 		if (body1)
-			body1->makeCollision(ps2->getCollideWithMaskBits());
+			body1->makeCollision(ps2->getCollisionCategoryBits());
 		if (body2)
-			body2->makeCollision(ps1->getCollideWithMaskBits());
+			body2->makeCollision(ps1->getCollisionCategoryBits());
 
 		/*
 		// For each contact point of the manifold 

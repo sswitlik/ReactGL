@@ -1,5 +1,6 @@
 #pragma once
 #include "reactphysics3d.h"
+#include "maths.h"
 
 class BodyObj
 {
@@ -11,14 +12,13 @@ public:
 	virtual void Draw();			//OpenGL drawing
 	void setType(int type);
 	void setMaterial(float, float);
+	void setCollisionCategory(Category cat);
 	virtual void update();
 	virtual void makeCollision(int collideWith);
 	
 	
 	//test 0.2
-	void testset();
-	void rd();
-	float angle;
+	//float angle;
 	
 	//protected:
 	rp3d::RigidBody *body;
@@ -26,6 +26,7 @@ public:
 	rp3d::CollisionShape *shape;
 	//rp3d::Material& material;
 
+	rp3d::Vector3 model;
 	//rotation angles
 	float x_yaw;
 	float y_pitch;

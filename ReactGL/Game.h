@@ -21,15 +21,17 @@ public:
 	void testarrowrotate();
 	//OBIEKTY GRY
 	int quantity;
+	std::vector <BodyObj *> map;
 	std::vector <BodyObj *> objs;
 	std::vector <BodyObj *> effects;
+
 	//test 0.2
 	void rd();
 	//private:
 	rp3d::DynamicsWorld *World;
 
-	BodyObj *floor;
-	BodyObj *obj1;
+	//BodyObj *floor;
+	//BodyObj *obj1;
 	void ExampleTestInit();
 	////TIME
 	unsigned int previousFrameTime;

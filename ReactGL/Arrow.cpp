@@ -21,14 +21,16 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	proxyShape->setUserData(this);
 	
 	//COLLISION FILTERING
-	proxyShape->setCollisionCategoryBits(ARROWcat);
-	proxyShape->setCollideWithMaskBits(MAPcat);
+	BodyObj::setCollisionCategory(ARROWcat);
+	//proxyShape->setCollisionCategoryBits(ARROWcat);
+	//proxyShape->setCollideWithMaskBits(MAPcat);
 
 	//COLOR
 	color.setAllValues(1, 0.5, 0);
 
 	time = 0;
 	collided = false;
+	drilled = false;
 	antivibr = false;
 }
 
@@ -77,12 +79,17 @@ void Arrow::update()
 	//	return;
 	//}
 
-	if (collided)	
+	if (drilled)	
 	{
 		rp3d::Vector3 stop(0, 0, 0);
 		body->setAngularVelocity(stop);
 		body->setLinearVelocity(stop);
 		body->enableGravity(false);
+	}
+	else
+	if (collided)
+	{
+		;
 	}
 	else
 	{
@@ -128,5 +135,10 @@ void Arrow::update()
 void Arrow::makeCollision(int collideWith)
 {
 	if (collideWith & MAPcat)
+	{
+		if (!collided)
+			drilled = true;
+	}
+	else
 		collided = true;
 }
