@@ -21,9 +21,6 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	rp3d::Transform transform2 = rp3d::Transform::identity();
 	proxyShape = body->addCollisionShape(shape, transform2, mass);
 
-	//test 0.2
-	//angle = 0;
-
 	//pointer to this - using in collision detection
 	proxyShape->setUserData(this);
 
@@ -32,12 +29,14 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat);
 
 	//DRAWING
+	model = NULL;
 	modelll.setAllValues(shapeData.x*2, shapeData.y * 2, shapeData.z * 2);
 }
 
 
 BodyObj::~BodyObj()
 {
+	delete model;
 	delete body;
 	delete shape;
 	delete proxyShape;
@@ -58,9 +57,19 @@ void BodyObj::Draw()
 	rp3d::Transform transform = body->getTransform();
 	float matrix[16];
 	transform.getOpenGLMatrix(matrix);
-
-
 	
+	if (model)
+	{
+	glPushMatrix();
+		glMultMatrixf(matrix);
+		glScalef(modelll.x, modelll.y, modelll.z);
+		glColor3f(0, 0.5, 0.5);
+		model->Render();
+		glColor3f(1, 1, 1);
+		//glutWireCube(1);
+	glPopMatrix();
+	}
+	else
 	{
 	glPushMatrix();
 		glMultMatrixf(matrix);
@@ -114,4 +123,11 @@ void BodyObj::update()
 void BodyObj::makeCollision(int collideWith)
 {
 
+}
+
+void BodyObj::modelInit(char *mesh, char *texture) 
+{
+	model = new Model();
+	model->Initialize(mesh, texture);
+	int i = 0;
 }

@@ -75,28 +75,8 @@ void Game::ExampleTestInit()
 	obj1->setMaterial(0.3, 0.8);
 	obj1->setType(1);
 	obj1->setCollisionCategory(MAPcat);
-	//obj1->InitializeModel("Models/kostka3.obj", "Models/kostka3.bmp");
+	obj1->modelInit("Models/kostka3.obj", "Models/kostka3.bmp");
 	map.push_back(obj1);
-
-}
-
-void Game::Draw_floor()
-{
-	mod->Render();
-	//floor->Draw(m);
-}
-Model * Game::getMod()
-{
-
-	//MODELTEST
-	mod = new Model();
-	mod->Initialize("Models/stone5.obj", "Models/Rock52.bmp");
-	return NULL;
-}
-
-void Game::Draw_1(float m[16])
-{
-	//obj1->Draw(m);
 }
 
 void Game::Update()
@@ -147,7 +127,7 @@ void Game::plus()
 	shapeData.setAllValues(0.5, 0.5, 0.5);
 	BodyObj *obj = new BodyObj(this->World, initPosition, initOrientation, shapeData, 2);
 	obj->setMaterial(0.8, 0.2);
-
+	obj->modelInit("Models/MyRock.obj", "Models/MyRockTex.bmp");
 	objs.push_back(obj);
 }
 
@@ -162,38 +142,38 @@ void Game::testshoot()
 	Arrow *b = player->test_shoot();
 	objs.push_back(b);
 }
-
-void Game::testarrowrotate()
-{
-	if (!objs.size())
-		return;
-
-	//rp3d::Vector3 pow(0, 3000, 0);
-	//objs[0]->body->applyForceToCenterOfMass(pow);
-	for (auto *i : objs)
-	{
-		i->body->enableGravity(false);
-		i->body->setLinearDamping(0.9);
-
-		rp3d::Transform t = i->body->getTransform();
-		rp3d::Quaternion q = t.getOrientation();
-		rp3d::Matrix3x3 m = q.getMatrix();
-
-		float x;
-		float y;
-		float z;
-
-		QuaternionO2IToEulerAngles(&x, &y, &z, q);
-		rp3d::Quaternion *newq;
-		if (y > 0)
-			newq = new rp3d::Quaternion(x, y - 0.25, z);
-		else
-			newq = new rp3d::Quaternion(x, y + 0.25, z);
-
-		newq->setAllValues(newq->y, newq->x, newq->z, newq->w);
-		t.setOrientation(*newq);
-		i->body->setTransform(t);
-
-		delete newq;
-	}
-}
+//
+//void Game::testarrowrotate()
+//{
+//	if (!objs.size())
+//		return;
+//
+//	//rp3d::Vector3 pow(0, 3000, 0);
+//	//objs[0]->body->applyForceToCenterOfMass(pow);
+//	for (auto *i : objs)
+//	{
+//		i->body->enableGravity(false);
+//		i->body->setLinearDamping(0.9);
+//
+//		rp3d::Transform t = i->body->getTransform();
+//		rp3d::Quaternion q = t.getOrientation();
+//		rp3d::Matrix3x3 m = q.getMatrix();
+//
+//		float x;
+//		float y;
+//		float z;
+//
+//		QuaternionO2IToEulerAngles(&x, &y, &z, q);
+//		rp3d::Quaternion *newq;
+//		if (y > 0)
+//			newq = new rp3d::Quaternion(x, y - 0.25, z);
+//		else
+//			newq = new rp3d::Quaternion(x, y + 0.25, z);
+//
+//		newq->setAllValues(newq->y, newq->x, newq->z, newq->w);
+//		t.setOrientation(*newq);
+//		i->body->setTransform(t);
+//
+//		delete newq;
+//	}
+//}

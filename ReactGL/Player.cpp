@@ -497,6 +497,7 @@ Arrow * Player::test_shoot()
 	rp3d::Vector3 force(angleX * power, angleY * power, angleZ * power);
 	bullet->body->applyForceToCenterOfMass(force);
 
+	bullet->BodyObj::modelInit("Models/arrow.obj", "Models/Rock.bmp");
 	//after shoot power to zero
 	nextShotPower = 0;
 

@@ -37,7 +37,7 @@ void Model::Render(void)
 {
 	glPushMatrix();
 
-	glTranslatef(0, 2,-3);
+	//glTranslatef(0, 2,-3);
 	glRotatef(0, 1.0f, 0.0f, 0.0f);
 	glRotatef(0, 0.0f, 1.0f, 0.0f);
 	glRotatef(0, 0.0f, 0.0f, 1.0f);

@@ -8,8 +8,6 @@ Game *game;
 Camera cam;
 Player *player;
 
-Model *mod;
-
 //MOUSE
 int mx, my;
 //Keyboard
@@ -25,25 +23,21 @@ void Display()
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
 
+	////SWIATLO
+	float l0_amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	float l0_dif[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float l0_spe[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float l0_pos[] = { -10.0f, .2f, 0.5f, 0.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, l0_amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, l0_dif);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, l0_spe);
+	glLightfv(GL_LIGHT0, GL_POSITION, l0_pos);
+
+
 	Player *player = game->getplayer();
 
 	player->cam.set();
 	float matrix[16];
-
-	//MODELTEST
-	glPushMatrix();
-	glTranslatef(3, 3, 0);
-	glScalef(0.02, 0.02, 0.02);
-	mod->Render();
-	glPopMatrix();
-
-	Model *modl = game->getMod();
-	glPushMatrix();
-	glTranslatef(-3, 3, 0);
-	glScalef(0.02, 0.02, 0.02);
-	//glutSolidCube(200);
-	game->Draw_floor();
-	glPopMatrix();
 
 	////PLAYER
 	//glPushMatrix();
@@ -69,6 +63,7 @@ void Display()
 
 	#pragma region 2D
 	{
+		glDisable(GL_LIGHTING);
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
@@ -91,6 +86,8 @@ void Display()
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
+
+		glEnable(GL_LIGHTING);
 	}
 
 	glFlush();			// skierowanie poleceñ do wykonania
@@ -156,7 +153,7 @@ void OnKeyDown(unsigned char key, int x, int y)
 	if (key == 'z')
 		game->testshoot();
 	if (key == 'c')
-		game->testarrowrotate();
+		;//game->testarrowrotate();
 	if (key == 'q')
 		game->Update();
 }
@@ -253,12 +250,6 @@ void MousePassiveMotion(int x, int y)
 
 void MouseMotion(int x, int y)
 {
-	
-
-
-
-
-
 	MousePassiveMotion(x, y);
 	glutPostRedisplay();
 }
@@ -270,9 +261,6 @@ void EntryFunc(int state)
 
 int main(int argc, char * argv[])
 {
-	game = new Game();
-	game->getMod();
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(screenWidth, screenHeight);
@@ -295,9 +283,13 @@ int main(int argc, char * argv[])
 	glutTimerFunc(17, OnTimer, 0);
 
 	glutIdleFunc(Idle);
+	//SWIATLO
+	glEnable(GL_LIGHTING);
+	float gl_amb[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, gl_amb);
 
-	mod = new Model();
-	mod->Initialize("Models/stone5.obj", "Models/Rock52.bmp");
+	game = new Game();
+	//game->modelInit();
 
 	glutMainLoop();
 	return 0;

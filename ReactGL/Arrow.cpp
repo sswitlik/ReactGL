@@ -28,6 +28,9 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	//COLOR
 	color.setAllValues(1, 0.5, 0);
 
+	//DRAWING
+	model = NULL;
+
 	time = 0;
 	collided = false;
 	drilled = false;
@@ -45,14 +48,26 @@ void Arrow::Draw()
 	float matrix[16];
 	transform.getOpenGLMatrix(matrix);
 
+	if (model)
+	{
 	glPushMatrix();
+		glMultMatrixf(matrix);
+		//glScalef(modelll.x, modelll.y, modelll.z);
+		glColor3f(0, 0.5, 0.5);
+		model->Render();
+	glPopMatrix();
+	}
+	else
+	{
+		glPushMatrix();
 		glMultMatrixf(matrix);
 		glColor3f(color.x, color.y, color.z);
 		glScalef(0.02, 1, 0.02);
 		glutSolidCube(1);
-		glColor3f(0.5,0.5, 0.5);
+		glColor3f(0.5, 0.5, 0.5);
 		glutWireCube(1);
 	glPopMatrix();
+	}
 }
 
 //void Arrow::update()
