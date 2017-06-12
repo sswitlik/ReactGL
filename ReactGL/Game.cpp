@@ -29,6 +29,7 @@ Game::Game()
 	//CONTACT 
 	listener = new GameEventListener(World,&effects);
 	World->setEventListener(listener);
+
 }
 
 
@@ -74,12 +75,23 @@ void Game::ExampleTestInit()
 	obj1->setMaterial(0.3, 0.8);
 	obj1->setType(1);
 	obj1->setCollisionCategory(MAPcat);
+	//obj1->InitializeModel("Models/kostka3.obj", "Models/kostka3.bmp");
 	map.push_back(obj1);
+
 }
 
-void Game::Draw_floor(float m[16])
+void Game::Draw_floor()
 {
+	mod->Render();
 	//floor->Draw(m);
+}
+Model * Game::getMod()
+{
+
+	//MODELTEST
+	mod = new Model();
+	mod->Initialize("Models/stone5.obj", "Models/Rock52.bmp");
+	return NULL;
 }
 
 void Game::Draw_1(float m[16])

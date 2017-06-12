@@ -1,5 +1,7 @@
 #pragma once
-#include "reactphysics3d.h"
+#include "stdafx.h"
+#include "Model.h"
+//#include "reactphysics3d.h"
 #include <vector>
 #include "BodyObj.h"
 #include "Player.h"
@@ -10,7 +12,7 @@ class Game
 public:
 	Game();
 	~Game();
-	void Draw_floor(float m[16]);
+	void Draw_floor();
 	void Draw_1(float m[16]);
 	void plus();
 	void Update();
@@ -24,6 +26,10 @@ public:
 	std::vector <BodyObj *> map;
 	std::vector <BodyObj *> objs;
 	std::vector <BodyObj *> effects;
+	//MODELTEST
+	Model *mod;
+	Model * getMod();
+
 
 	//test 0.2
 	void rd();

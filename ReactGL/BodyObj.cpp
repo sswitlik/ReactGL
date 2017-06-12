@@ -32,13 +32,15 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat);
 
 	//DRAWING
-	model.setAllValues(shapeData.x*2, shapeData.y * 2, shapeData.z * 2);
+	modelll.setAllValues(shapeData.x*2, shapeData.y * 2, shapeData.z * 2);
 }
 
 
 BodyObj::~BodyObj()
 {
-	//delete
+	delete body;
+	delete shape;
+	delete proxyShape;
 }
 
 void BodyObj::Draw(float m[16])
@@ -57,14 +59,18 @@ void BodyObj::Draw()
 	float matrix[16];
 	transform.getOpenGLMatrix(matrix);
 
+
+	
+	{
 	glPushMatrix();
-	glMultMatrixf(matrix);
-	glScalef(model.x, model.y, model.z);
-	glColor3f(0, 0.5, 0.5);
-	glutSolidCube(1);
-	glColor3f(0, 0, 0);
-	glutWireCube(1);
+		glMultMatrixf(matrix);
+		glScalef(modelll.x, modelll.y, modelll.z);
+		glColor3f(0, 0.5, 0.5);
+		glutSolidCube(1);
+		glColor3f(0, 0, 0);
+		glutWireCube(1);
 	glPopMatrix();
+	}
 }
 
 void BodyObj::setCollisionCategory(Category cat)

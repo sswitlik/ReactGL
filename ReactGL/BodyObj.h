@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "reactphysics3d.h"
 #include "maths.h"
 
@@ -8,6 +9,7 @@ public:
 	BodyObj();
 	BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::Vector3 shapeData, rp3d::decimal mass);
 	~BodyObj();
+	void InitializeModel(std::string mesh, std::string texture);
 	void Draw(float m[16]);	//return translate matrix
 	virtual void Draw();			//OpenGL drawing
 	void setType(int type);
@@ -26,7 +28,7 @@ public:
 	rp3d::CollisionShape *shape;
 	//rp3d::Material& material;
 
-	rp3d::Vector3 model;
+	rp3d::Vector3 modelll;
 	//rotation angles
 	float x_yaw;
 	float y_pitch;

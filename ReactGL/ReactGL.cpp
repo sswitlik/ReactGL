@@ -2,14 +2,13 @@
 //
 
 #include "stdafx.h"
-#include <GL\freeglut.h>
-#include "Game.h"
-#include "Camera.h"
-#include "Player.h"
+#include "Model.h"
 
-Game game;
+Game *game;
 Camera cam;
 Player *player;
+
+Model *mod;
 
 //MOUSE
 int mx, my;
@@ -26,10 +25,25 @@ void Display()
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
 
-	Player *player = game.getplayer();
+	Player *player = game->getplayer();
 
 	player->cam.set();
 	float matrix[16];
+
+	//MODELTEST
+	glPushMatrix();
+	glTranslatef(3, 3, 0);
+	glScalef(0.02, 0.02, 0.02);
+	mod->Render();
+	glPopMatrix();
+
+	Model *modl = game->getMod();
+	glPushMatrix();
+	glTranslatef(-3, 3, 0);
+	glScalef(0.02, 0.02, 0.02);
+	//glutSolidCube(200);
+	game->Draw_floor();
+	glPopMatrix();
 
 	////PLAYER
 	//glPushMatrix();
@@ -43,12 +57,12 @@ void Display()
 	//glPopMatrix();
 	//player->Draw();
 
-	for (auto *i : game.map)
+	for (auto *i : game->map)
 	{
 		i->Draw();
 	}
 
-	for (auto *i : game.objs)
+	for (auto *i : game->objs)
 	{
 		i->Draw();
 	}
@@ -109,7 +123,7 @@ void OnTimer(int id)
 {
 	glutTimerFunc(17, OnTimer, 0);
 
-	Player *player = game.getplayer();
+	Player *player = game->getplayer();
 
 	if (keystate['u'])
 		player->cam.rotate(UP, 2.5);
@@ -138,13 +152,13 @@ void OnKeyDown(unsigned char key, int x, int y)
 		glutLeaveMainLoop();
 	}
 	if (key == 'x')
-		game.plus();
+		game->plus();
 	if (key == 'z')
-		game.testshoot();
+		game->testshoot();
 	if (key == 'c')
-		game.testarrowrotate();
+		game->testarrowrotate();
 	if (key == 'q')
-		game.Update();
+		game->Update();
 }
 
 void OnKeyPress(unsigned char key, int x, int y) {
@@ -159,7 +173,7 @@ void OnKeyPress(unsigned char key, int x, int y) {
 // Obs³uga zdarzenia puszczenia klawisza.
 void OnKeyUp(unsigned char key, int x, int y)
 {
-	Player *player = game.getplayer();
+	Player *player = game->getplayer();
 
 	if (key == 'w')
 		player->unset_control(0);
@@ -189,14 +203,14 @@ void KeyboardFunc(unsigned char key, int x, int y)
 
 void Idle()
 {
-	game.Update();
+	game->Update();
 	//player->update();
 	glutPostRedisplay();
 }
 
 void MouseButton(int button, int state, int x, int y)
 {
-	Player *player = game.getplayer();
+	Player *player = game->getplayer();
 	if (button == GLUT_LEFT_BUTTON)
 	{
 		if (state == GLUT_DOWN)
@@ -205,7 +219,7 @@ void MouseButton(int button, int state, int x, int y)
 		{
 			player->unset_control(5);
 			keystate[0] = false;
-			game.testshoot();
+			game->testshoot();
 		}
 	}
 	
@@ -215,7 +229,7 @@ void MouseButton(int button, int state, int x, int y)
 // obs³uga ruchu kursora myszki
 void MousePassiveMotion(int x, int y)
 {
-	Player *player = game.getplayer();
+	Player *player = game->getplayer();
 
 	//CAMERA ROTATION
 	if (x > screenWidth-200 || x < 200 || y > screenHeight -150 || y < 150)
@@ -256,6 +270,9 @@ void EntryFunc(int state)
 
 int main(int argc, char * argv[])
 {
+	game = new Game();
+	game->getMod();
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(screenWidth, screenHeight);
@@ -278,6 +295,9 @@ int main(int argc, char * argv[])
 	glutTimerFunc(17, OnTimer, 0);
 
 	glutIdleFunc(Idle);
+
+	mod = new Model();
+	mod->Initialize("Models/stone5.obj", "Models/Rock52.bmp");
 
 	glutMainLoop();
 	return 0;
