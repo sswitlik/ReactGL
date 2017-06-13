@@ -9,28 +9,37 @@ class BodyObj
 public:
 	BodyObj();
 	BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::Vector3 shapeData, rp3d::decimal mass);
-	~BodyObj();
+	BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::CollisionShape *shapeData, rp3d::decimal mass);
+
+	virtual ~BodyObj();
 	void modelInit(char *mesh, char *texture);
 	void Draw(float m[16]);	//return translate matrix
 	virtual void Draw();			//OpenGL drawing
-	void setType(int type);
-	void setMaterial(float, float);
+	void setType(rp3d::BodyType type);
+	void setMaterial(float bounciness, float friction);
 	void setCollisionCategory(Category cat);
+	virtual void setGravityEnable(bool arg);
 	virtual void update();
-	virtual void makeCollision(int collideWith);
+	virtual void makeCollision(BodyObj *CollideWith);
 	
-	//protected:
+	rp3d::RigidBody * getBody();
+	rp3d::ProxyShape * getProxyShape();
+	bool getIsDeleted();
+	bool getOneParticles();
+	void setOneParticles(bool arg);
+
+protected:
 	rp3d::RigidBody *body;
 	rp3d::ProxyShape *proxyShape;
 	rp3d::CollisionShape *shape;
-	//rp3d::Material& material;
 	
 	//DRAWING
 	Model * model;
 	rp3d::Vector3 modelll;
 	
-	////rotation angles
-	//float x_yaw;
-	//float y_pitch;
-	//float z_roll;
+	//to avoid multiple deleteing the same body
+	bool IsDeleted;
+	rp3d::DynamicsWorld *gameWorld;
+
+	bool OneParticles;
 };

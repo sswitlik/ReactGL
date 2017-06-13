@@ -15,7 +15,7 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	shape = new rp3d::BoxShape(shapeData, 0.1);
 
 	rp3d::Transform transform2 = rp3d::Transform::identity();
-	rp3d::decimal mass = rp3d::decimal(4.0);
+	rp3d::decimal mass = rp3d::decimal(1.0);
 	proxyShape = body->addCollisionShape(shape, transform2, mass);
 
 	//body->enableGravity(false);
@@ -26,13 +26,16 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 
 	//COLLISION FILTERING
 	proxyShape->setCollisionCategoryBits(PLAYERcat);
-	proxyShape->setCollideWithMaskBits(MAPcat);
+	proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | RUBBISHcat);
 
 	//ROTATION
 	Yaw = 0; Roll = 0; Pitch = 0;
 
 	//CAMERA
 	cam.sync(initPosition, Yaw, Roll, Pitch);
+	cam.lx = 0;
+	cam.ly = 0;
+	cam.lz = 1;
 
 	//CONTROL
 	w = false;
@@ -45,8 +48,12 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	nextShotPower = 0;
 
 	//STATS
-	accuracy = 1;
+	accuracy = 10;
 	shootSpeed = 500;
+
+	//SKYDOME
+	sky = new CSkydome();
+	sky->Initialize();
 }
 
 Player::~Player()
@@ -301,7 +308,7 @@ void Player::serve_controls()
 		if (jump && abs(vel.y) < jump_border)
 		{
 			jump_border = 0.01;
-			vel.y += 4;
+			vel.y += 6;
 			rp3d::Vector3 force(vel.x, vel.y, vel.z);
 			body->setLinearVelocity(force);
 		}
@@ -377,6 +384,10 @@ void Player::Draw()
 	rp3d::Transform transform = body->getTransform();
 	float matrix[16];
 	transform.getOpenGLMatrix(matrix);
+	rp3d::Vector3 position = transform.getPosition();
+
+	sky->Position = position;
+	sky->Render();
 
 	glPushMatrix();
 		glMultMatrixf(matrix);
@@ -384,7 +395,7 @@ void Player::Draw()
 		glColor3f(0, 0, 0.5);
 		//glutSolidCube(1);
 		glColor3f(1, 1, 1);
-		glutWireCube(1);
+		//glutWireCube(1);
 	glPopMatrix();
 }
 
@@ -486,16 +497,17 @@ Arrow * Player::test_shoot()
 	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.05, 0.5, 10);
 
 	rp3d::Vector3 CenterMass(0, 0.2, 0);;
-	bullet->body->setCenterOfMassLocal(CenterMass);
+	auto body = bullet->getBody();
+	body->setCenterOfMassLocal(CenterMass);
 
-	rp3d::Material& material = bullet->body->getMaterial();
+	rp3d::Material& material = body->getMaterial();
 	//material.setFrictionCoefficient(0.4);
-	bullet->body->setAngularDamping(0.6);
+	body->setAngularDamping(0.6);
 	material.setRollingResistance(0.1);
 
 	float power = nextShotPower;
 	rp3d::Vector3 force(angleX * power, angleY * power, angleZ * power);
-	bullet->body->applyForceToCenterOfMass(force);
+	body->applyForceToCenterOfMass(force);
 
 	bullet->BodyObj::modelInit("Models/arrow.obj", "Models/Rock.bmp");
 	//after shoot power to zero
@@ -503,4 +515,14 @@ Arrow * Player::test_shoot()
 
 	return bullet;
 }
+
+void Player::ImproveAccuracy(int plusAccuracy)
+{
+	accuracy -= plusAccuracy;
+	if (accuracy < 1)
+		accuracy = 1;
+}
+
+
+
 

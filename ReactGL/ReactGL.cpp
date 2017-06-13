@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Model.h"
+#include "Events.h"
 
 Game *game;
 Camera cam;
@@ -17,26 +18,16 @@ int screenHeight = 600, screenWidth = 800;
 
 void Display()
 {
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClearColor(0.878, 0.960, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
 
-	////SWIATLO
-	float l0_amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	float l0_dif[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	float l0_spe[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	float l0_pos[] = { -10.0f, .2f, 0.5f, 0.0f };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, l0_amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, l0_dif);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, l0_spe);
-	glLightfv(GL_LIGHT0, GL_POSITION, l0_pos);
-
-
 	Player *player = game->getplayer();
 
 	player->cam.set();
+	player->Draw();
 	float matrix[16];
 
 	////PLAYER
@@ -50,6 +41,11 @@ void Display()
 	//glutWireCube(1);
 	//glPopMatrix();
 	//player->Draw();
+
+	for (auto *i : game->effects)
+	{
+		i->Draw();
+	}
 
 	for (auto *i : game->map)
 	{
@@ -87,7 +83,7 @@ void Display()
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
 	}
 
 	glFlush();			// skierowanie poleceñ do wykonania
@@ -153,7 +149,9 @@ void OnKeyDown(unsigned char key, int x, int y)
 	if (key == 'z')
 		game->testshoot();
 	if (key == 'c')
-		;//game->testarrowrotate();
+	{
+		;
+	}
 	if (key == 'q')
 		game->Update();
 }
@@ -261,6 +259,25 @@ void EntryFunc(int state)
 
 int main(int argc, char * argv[])
 {
+	//rp3d::Vector3 gr(0, -10, 0);
+	//rp3d::DynamicsWorld *world = new rp3d::DynamicsWorld(gr);
+
+	//rp3d::Vector3 initPosition;
+	//rp3d::Quaternion initOrientation;
+	//rp3d::Vector3 shapeData(1,1,1);
+	//
+	//initPosition.setAllValues(0, -4, 200);
+	//initOrientation = rp3d::Quaternion::identity();
+	//rp3d::Transform transform(initPosition, initOrientation);
+	//rp3d::RigidBody *body = world->createRigidBody(transform);
+
+	//rp3d::BoxShape *shape = new rp3d::BoxShape(shapeData, 0.1);
+	//rp3d::Transform transform2 = rp3d::Transform::identity();
+	//rp3d::ProxyShape *proxy = body->addCollisionShape(shape, transform2, 2);
+
+	//world->destroyRigidBody(body);
+	//int i = 0;
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(screenWidth, screenHeight);
@@ -283,14 +300,10 @@ int main(int argc, char * argv[])
 	glutTimerFunc(17, OnTimer, 0);
 
 	glutIdleFunc(Idle);
-	//SWIATLO
-	glEnable(GL_LIGHTING);
-	float gl_amb[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, gl_amb);
 
 	game = new Game();
-	//game->modelInit();
 
 	glutMainLoop();
+	
 	return 0;
 }

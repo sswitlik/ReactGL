@@ -4,6 +4,7 @@
 #include "BodyObj.h"
 #include "Arrow.h"
 //#include "Game.h"
+#include "Skydome.h"
 
 class Player
 {
@@ -21,9 +22,14 @@ public:
 	void rotate2(Direction dir, float angle);
 	void look_vertical(float angle);
 	Arrow * test_shoot();
+
+	//DRAWING
 	void Draw();
 	void Drawsight(int xcentr, int ycentr);
 	void DrawShootPower(int xcentr, int ysize);
+
+	//ATTRIBUTE SETTING
+	void ImproveAccuracy(int plusAccuracy);
 
 	//void set();
 	Camera cam;
@@ -50,13 +56,16 @@ public:
 	//PHYSICS
 	rp3d::RigidBody *body;
 	rp3d::ProxyShape *proxyShape;
-	rp3d::BoxShape *shape;
+	rp3d::CollisionShape *shape;
 
 	rp3d::DynamicsWorld *world;
 
 	//STATS
 	float accuracy;
 	int shootSpeed;
+
+	//SKYDOME
+	CSkydome *sky;
 };
 
 

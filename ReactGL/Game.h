@@ -6,29 +6,13 @@
 #include "BodyObj.h"
 #include "Player.h"
 #include "GameEventListener.h"
+#include "Level.h"
+#include "Events.h"
 
 class Game
 {
-public:
-	Game();
-	~Game();
-	//void Draw_floor();
-	//void Draw_1(float m[16]);
-	void plus();
-	void Update();
-	void ExampleTestInit();		//init map
-
-	//PLAYER
-	Player * getplayer();
-	void testshoot();
-	//void testarrowrotate();
-	//OBIEKTY GRY
-	int quantity;
-	std::vector <BodyObj *> map;
-	std::vector <BodyObj *> objs;
-	std::vector <BodyObj *> effects;
-
-	//private:
+private:
+	//WORLD
 	rp3d::DynamicsWorld *World;
 	
 	////TIME
@@ -40,4 +24,35 @@ public:
 
 	//CONTACT
 	GameEventListener *listener;
+
+	//LEVEL
+	Level *level;
+
+	//EVENTS
+	Events events;
+
+public:
+	Game();
+	~Game();
+
+	void plus();
+	void Update();
+	void ExampleTestInit();		//init map
+	void InitLevel();
+
+	//PUBLIC GARBAGE COLLECTOR FOR ALL THE GAME
+	std::vector<BodyObj *> GarbageCollector;
+	
+	//PLAYER
+	Player * getplayer();
+	void testshoot();
+
+	//OBIEKTY GRY
+	std::vector <BodyObj *> map;
+	std::vector <BodyObj *> objs;
+	std::vector <BodyObj *> effects;
+
+	Events getEvents();
+
+	rp3d::DynamicsWorld * getWorld();
 };

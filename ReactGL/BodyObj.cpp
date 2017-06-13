@@ -3,8 +3,11 @@
 #include "BodyObj.h"
 #include <cmath>
 #include "maths.h"
+#include "Game.h"
 
 #define RAD  0.01745329
+
+extern Game *game;
 
 BodyObj::BodyObj()
 {
@@ -25,21 +28,51 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	proxyShape->setUserData(this);
 
 	//COLLISION FILTERING
-	proxyShape->setCollisionCategoryBits(FREEcat);
-	proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat);
-
+	setCollisionCategory(FREEcat);
+	
 	//DRAWING
 	model = NULL;
 	modelll.setAllValues(shapeData.x*2, shapeData.y * 2, shapeData.z * 2);
+
+	//SAVE DELETING
+	IsDeleted = false;
+	gameWorld = world;
+
+	//PARTICLES
+	OneParticles = true;
 }
 
+BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::CollisionShape *shapeData, rp3d::decimal mass)
+{
+	rp3d::Transform transform(initPosition, initOrientation);
+	body = world->createRigidBody(transform);
+
+	shape = shapeData;
+
+	rp3d::Transform transform2 = rp3d::Transform::identity();
+	proxyShape = body->addCollisionShape(shape, transform2, mass);
+
+	//pointer to this - using in collision detection
+	proxyShape->setUserData(this);
+
+	//COLLISION FILTERING
+	setCollisionCategory(FREEcat);
+
+	//DRAWING
+	model = NULL;
+	modelll.setAllValues(1, 1, 1);
+
+	//SAVE DELETING
+	IsDeleted = false;
+	gameWorld = world;
+}
 
 BodyObj::~BodyObj()
 {
 	delete model;
-	delete body;
 	delete shape;
-	delete proxyShape;
+	gameWorld->destroyRigidBody(body);
+	//delete proxyShape;
 }
 
 void BodyObj::Draw(float m[16])
@@ -62,7 +95,7 @@ void BodyObj::Draw()
 	{
 	glPushMatrix();
 		glMultMatrixf(matrix);
-		glScalef(modelll.x, modelll.y, modelll.z);
+		glScalef(0.5, 0.5, 0.5);
 		glColor3f(0, 0.5, 0.5);
 		model->Render();
 		glColor3f(1, 1, 1);
@@ -87,24 +120,33 @@ void BodyObj::setCollisionCategory(Category cat)
 	proxyShape->setCollisionCategoryBits(cat);
 	switch (cat)
 	{
+	case FREEcat:
+		proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat | EFFECTcat | RUBBISHcat);
+		break;
 	case MAPcat:
-		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat);
+		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat | RUBBISHcat);
 		break;
 	case ARROWcat:
-		proxyShape->setCollideWithMaskBits(MAPcat | ARROWcat | FREEcat);
+		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | RUBBISHcat);
 		break;
+	case EFFECTcat:
+		proxyShape->setCollideWithMaskBits(0);
+	case RUBBISHcat:
+		proxyShape->setCollideWithMaskBits(ALLcats);
 
 	}
 }
 
-void BodyObj::setType(int type)
+void BodyObj::setType(rp3d::BodyType type)
 {
-	switch (type)
+	body->setType(type);
+
+	/*switch (type)
 	{
+	case 0:	body->setType(rp3d::DYNAMIC); break;
 	case 1:	body->setType(rp3d::STATIC); break;
-	case 2:	body->setType(rp3d::DYNAMIC); break;
-	case 3: body->setType(rp3d::KINEMATIC); break;
-	}
+	case 2: body->setType(rp3d::KINEMATIC); break;
+	}*/
 }
 
 void BodyObj::setMaterial(float bounce, float friction)
@@ -120,9 +162,15 @@ void BodyObj::update()
 
 }
 
-void BodyObj::makeCollision(int collideWith)
+void BodyObj::makeCollision(BodyObj *CollideWith)
 {
-
+	int collideCategory = CollideWith->getProxyShape()->getCollisionCategoryBits();
+	if ((collideCategory & RUBBISHcat) && !IsDeleted)
+	{
+		IsDeleted = true;
+		//delete this;
+		//game->GarbageCollector.push_back(this);
+	}
 }
 
 void BodyObj::modelInit(char *mesh, char *texture) 
@@ -130,4 +178,34 @@ void BodyObj::modelInit(char *mesh, char *texture)
 	model = new Model();
 	model->Initialize(mesh, texture);
 	int i = 0;
+}
+
+void BodyObj::setGravityEnable(bool arg)
+{
+	body->enableGravity(arg);
+}
+
+rp3d::RigidBody * BodyObj::getBody()
+{
+	return body;
+}
+
+rp3d::ProxyShape * BodyObj::getProxyShape()
+{
+	return proxyShape;
+}
+
+bool BodyObj::getIsDeleted()
+{
+	return IsDeleted;
+}
+
+bool BodyObj::getOneParticles()
+{
+	return OneParticles;
+}
+
+void BodyObj::setOneParticles(bool arg)
+{
+	OneParticles = arg;
 }

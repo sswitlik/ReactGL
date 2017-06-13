@@ -3,6 +3,8 @@
 #include "GL/freeglut.h"
 #include "maths.h"
 
+extern Game *game;
+
 Arrow::Arrow()
 {
 
@@ -27,7 +29,7 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 
 	//COLOR
 	color.setAllValues(1, 0.5, 0);
-
+	damage = 1;
 	//DRAWING
 	model = NULL;
 
@@ -35,6 +37,11 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	collided = false;
 	drilled = false;
 	antivibr = false;
+
+	//SAVE DELETING
+	IsDeleted = false;
+
+	gameWorld = world;
 }
 
 
@@ -99,12 +106,12 @@ void Arrow::update()
 		rp3d::Vector3 stop(0, 0, 0);
 		body->setAngularVelocity(stop);
 		body->setLinearVelocity(stop);
-		body->enableGravity(false);
+		
 	}
 	else
 	if (collided)
 	{
-		;
+		int i=0;
 	}
 	else
 	{
@@ -147,13 +154,70 @@ void Arrow::update()
 	}
 }
 
-void Arrow::makeCollision(int collideWith)
+void Arrow::makeCollision(BodyObj *CollideWith)
 {
-	if (collideWith & MAPcat)
+	int collideCategory = CollideWith->getProxyShape()->getCollisionCategoryBits();
+
+
+	if (getOneParticles())
 	{
-		if (!collided)
+		rp3d::Vector3 pos = body->getTransform().getPosition();
+		rp3d::Vector3 vel = body->getLinearVelocity();
+		vel.normalize();
+		pos += vel / 4;
+		for (int i = 0; i < 3; i++)
+		{
+			int x = rand() % 30000 - 15000,
+				y = rand() % 30000 - 15000,
+				z = rand() % 30000 - 15000;
+			rp3d::Vector3 force(x, y, z);
+			rp3d::Vector3 col(0.5, 0, 0);
+			Particle *partic = new Particle(gameWorld, pos, 0.02, col);
+			partic->setMaterial(0.5, 0.1);
+			partic->giveForce(force);
+			partic->setCollisionCategory(EFFECTcat);
+			if (game->effects.size() < 15)
+				game->effects.push_back(partic);
+			setOneParticles(false);
+		}
+	}
+
+	if (collideCategory & MAPcat)
+	{
+		if (!collided)		//je¿eli jeszcze nie kolidowal czyli leci prosto
+		{
 			drilled = true;
+			body->enableGravity(false);
+		}
+	}
+	else
+	if (collideCategory & RUBBISHcat)
+	{
+		BodyObj::makeCollision(CollideWith);
 	}
 	else
 		collided = true;
+}
+
+void Arrow::setGravityEnable(bool arg)
+{
+	BodyObj::setGravityEnable(arg);
+	if (arg)
+	{
+		drilled = false;
+		collided = true;
+	}
+	else
+		drilled = true;
+}
+
+void Arrow::pushToGravity()
+{
+	rp3d::Vector3 push(0, -0.01, 0);
+	body->applyForceToCenterOfMass(push);
+}
+
+float Arrow::getDamage()
+{
+	return damage;
 }

@@ -20,5 +20,12 @@
 #include "maths.h"
 #include "Player.h"
 #include "Model.h"
+#include "Water.h"
+#include "Level.h"
+#include "LevelStraightFall.h"
+#include "Skydome.h"
+#include "Aim.h"
+#include "Events.h"
+#include "Particle.h"
 
 // TODO: W tym miejscu odwo³aj siê do dodatkowych nag³ówków wymaganych przez program

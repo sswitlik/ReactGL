@@ -18,6 +18,10 @@ public:
 
 	void Draw();
 	void update();
-	void makeCollision(int collideWith);
+	void makeCollision(BodyObj *CollideWith);
+	void setGravityEnable(bool arg);
+	void pushToGravity();
+
+	float getDamage();
 };
 
