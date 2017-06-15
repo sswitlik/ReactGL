@@ -31,6 +31,15 @@ private:
 	//EVENTS
 	Events events;
 
+	//MODELS
+	Model *AimBonusModel;
+	Model *Rock1Model;
+	Model *Rock2Model;
+	Model *ArrowModel;
+	Model *WaterModel;
+	Model *BirdModel;
+	Model *SandModel;
+
 public:
 	Game();
 	~Game();
@@ -39,6 +48,7 @@ public:
 	void Update();
 	void ExampleTestInit();		//init map
 	void InitLevel();
+	void Draw();
 
 	//PUBLIC GARBAGE COLLECTOR FOR ALL THE GAME
 	std::vector<BodyObj *> GarbageCollector;

@@ -13,21 +13,31 @@ public:
 
 	virtual ~BodyObj();
 	void modelInit(char *mesh, char *texture);
+	void modelInit(Model *model);
 	void Draw(float m[16]);	//return translate matrix
 	virtual void Draw();			//OpenGL drawing
-	void setType(rp3d::BodyType type);
 	void setMaterial(float bounciness, float friction);
-	void setCollisionCategory(Category cat);
 	virtual void setGravityEnable(bool arg);
 	virtual void update();
 	virtual void makeCollision(BodyObj *CollideWith);
-	
+	virtual void init(rp3d::Vector3 position, rp3d::Quaternion orientation);
+	virtual void kill();
+
 	rp3d::RigidBody * getBody();
 	rp3d::ProxyShape * getProxyShape();
 	bool getIsDeleted();
+	void setIsDeleted(bool arg);
 	bool getOneParticles();
+	bool getOneSplash();
 	void setOneParticles(bool arg);
+	void setOneSplash(bool arg);
+	void setCollisionCategory(Category cat);
+	void setCollisionCategory(int cat);
+	int getCollsionCategory();
 
+	void setType(rp3d::BodyType type);
+	rp3d::BodyType getType();
+	rp3d::CollisionShape * getShape();
 protected:
 	rp3d::RigidBody *body;
 	rp3d::ProxyShape *proxyShape;
@@ -42,4 +52,5 @@ protected:
 	rp3d::DynamicsWorld *gameWorld;
 
 	bool OneParticles;
+	bool OneSplash;
 };

@@ -17,4 +17,5 @@ public:
 	void Draw();
 	void makeCollision(BodyObj *CollideWith);
 	void update();
+	void kill();
 };

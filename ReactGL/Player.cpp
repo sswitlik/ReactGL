@@ -48,12 +48,17 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	nextShotPower = 0;
 
 	//STATS
-	accuracy = 10;
+	accuracy = 50;
 	shootSpeed = 500;
 
 	//SKYDOME
 	sky = new CSkydome();
 	sky->Initialize();
+}
+
+void Player::loadLevel(Level *level)
+{
+	this->level = level;
 }
 
 Player::~Player()
@@ -308,7 +313,7 @@ void Player::serve_controls()
 		if (jump && abs(vel.y) < jump_border)
 		{
 			jump_border = 0.01;
-			vel.y += 6;
+			vel.y += 5;
 			rp3d::Vector3 force(vel.x, vel.y, vel.z);
 			body->setLinearVelocity(force);
 		}
@@ -386,8 +391,32 @@ void Player::Draw()
 	transform.getOpenGLMatrix(matrix);
 	rp3d::Vector3 position = transform.getPosition();
 
-	sky->Position = position;
-	sky->Render();
+	if (position.y < 0)
+	{
+		glEnable(GL_FOG);
+		float gl_fogcolor[] = { 0.1, 0.2, 0.8, 1.0f };
+		glFogi(GL_FOG_MODE, GL_LINEAR);
+		glFogfv(GL_FOG_COLOR, gl_fogcolor);
+		glFogf(GL_FOG_START, 0.0f);
+		glFogf(GL_FOG_END, 10.0f);
+
+		sky->Position = position;
+		sky->Render();
+	}
+	else
+	{
+		glEnable(GL_FOG);
+		float gl_fogcolor[] = { 0.875f, 0.957f, 1.0f, 1.0f };
+		glFogi(GL_FOG_MODE, GL_LINEAR);
+		glFogfv(GL_FOG_COLOR, gl_fogcolor);
+		glFogf(GL_FOG_START, 6.0f);
+		glFogf(GL_FOG_END, 24.0f);
+
+		glDisable(GL_FOG);
+			sky->Position = position;
+			sky->Render();
+		glEnable(GL_FOG);
+	}
 
 	glPushMatrix();
 		glMultMatrixf(matrix);
@@ -463,7 +492,7 @@ void Player::make_jump()
 	body->applyForceToCenterOfMass(force);
 }
 
-Arrow * Player::test_shoot()
+BodyObj * Player::test_shoot()
 {
 	rp3d::Transform t = body->getTransform();
 	rp3d::Vector3 initPosition = t.getPosition();
@@ -494,7 +523,8 @@ Arrow * Player::test_shoot()
 	//Capsule
 	const rp3d::Vector2 shapeData(0.1, 0.5);
 
-	Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.05, 0.5, 10);
+	//Arrow *bullet = new Arrow(world, newposition, initOrientation, 0.05, 0.5, 10);
+	BodyObj *bullet = level->Make("arrow", newposition, initOrientation);
 
 	rp3d::Vector3 CenterMass(0, 0.2, 0);;
 	auto body = bullet->getBody();
@@ -509,7 +539,7 @@ Arrow * Player::test_shoot()
 	rp3d::Vector3 force(angleX * power, angleY * power, angleZ * power);
 	body->applyForceToCenterOfMass(force);
 
-	bullet->BodyObj::modelInit("Models/arrow.obj", "Models/Rock.bmp");
+	//bullet->BodyObj::modelInit("Models/arrow.obj", "Models/Rock.bmp");
 	//after shoot power to zero
 	nextShotPower = 0;
 

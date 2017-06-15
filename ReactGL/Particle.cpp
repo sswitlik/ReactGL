@@ -29,6 +29,9 @@ Particle::Particle(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, float
 	IsDeleted = false;
 	gameWorld = world;		//in Destructor needed
 
+	//LEVEL INITIALIZATION
+	body->setType(rp3d::STATIC);
+
 //-------------------------------------------
 	this->color = color;
 
@@ -84,7 +87,6 @@ Particle::Particle(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, float
 
 Particle::~Particle()
 {
-	int i = 0;
 }
 
 void Particle::update()
@@ -105,10 +107,9 @@ void Particle::Draw()
 	glPushMatrix();
 		glMultMatrixf(matrix);
 		glScalef(modelll.x, modelll.y, modelll.z);
-		glColor3f(color.x,color.y,color.z);
+		//glColor3i(23, 171, 219);
+		glColor3ub (color.x,color.y,color.z);
 		glutSolidCube(1);
-		glColor3f(0, 0, 0);
-		//glutWireCube(1);
 	glPopMatrix();
 
 }

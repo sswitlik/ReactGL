@@ -83,3 +83,17 @@ void Aim::Draw()
 		glPopMatrix();
 	}
 }
+
+void Aim::kill()
+{
+	for (auto it = drilledIn.begin(); it < drilledIn.end(); it++)
+	{
+		(*it)->setGravityEnable(true);
+		(*it)->pushToGravity();
+	}
+
+	auto events = game->getEvents();
+	events.ImprovePlayerAccuracy(100);
+
+	BodyObj::kill();
+}

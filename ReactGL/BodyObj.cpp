@@ -19,7 +19,7 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	rp3d::Transform transform(initPosition, initOrientation);
 	body = world->createRigidBody(transform);
 
-	shape = new rp3d::BoxShape(shapeData, 0.1);
+	shape = new rp3d::BoxShape(shapeData, rp3d::decimal(0.1));
 
 	rp3d::Transform transform2 = rp3d::Transform::identity();
 	proxyShape = body->addCollisionShape(shape, transform2, mass);
@@ -28,7 +28,7 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	proxyShape->setUserData(this);
 
 	//COLLISION FILTERING
-	setCollisionCategory(FREEcat);
+	setCollisionCategory(ARROWcat);
 	
 	//DRAWING
 	model = NULL;
@@ -40,6 +40,10 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 
 	//PARTICLES
 	OneParticles = true;
+	OneSplash = true;
+
+	//LEVEL INITIALIZATION
+	body->setType(rp3d::STATIC);
 }
 
 BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::CollisionShape *shapeData, rp3d::decimal mass)
@@ -69,10 +73,9 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 
 BodyObj::~BodyObj()
 {
-	delete model;
 	delete shape;
+	body->removeCollisionShape(proxyShape);
 	gameWorld->destroyRigidBody(body);
-	//delete proxyShape;
 }
 
 void BodyObj::Draw(float m[16])
@@ -95,7 +98,8 @@ void BodyObj::Draw()
 	{
 	glPushMatrix();
 		glMultMatrixf(matrix);
-		glScalef(0.5, 0.5, 0.5);
+		glScalef(modelll.x*0.6, modelll.y*0.6, modelll.z*0.6);
+		//glScalef(0.5, 0.5, 0.5);
 		glColor3f(0, 0.5, 0.5);
 		model->Render();
 		glColor3f(1, 1, 1);
@@ -121,34 +125,51 @@ void BodyObj::setCollisionCategory(Category cat)
 	switch (cat)
 	{
 	case FREEcat:
-		proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat | EFFECTcat | RUBBISHcat);
+		proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat | EFFECTcat | WATERcat | RUBBISHcat);
 		break;
 	case MAPcat:
-		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat | RUBBISHcat);
+		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case ARROWcat:
-		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | RUBBISHcat);
+		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		proxyShape->setCollideWithMaskBits(0);
+		this->proxyShape->setCollideWithMaskBits( 0 );
+		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);
+		break;
+
+	}
+}
+void BodyObj::setCollisionCategory(int cat)
+{
+	proxyShape->setCollisionCategoryBits(cat);
+	switch (cat)
+	{
+	case FREEcat:
+		proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat | EFFECTcat | WATERcat | RUBBISHcat);
+		break;
+	case MAPcat:
+		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat | WATERcat | RUBBISHcat);
+		break;
+	case ARROWcat:
+		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
+		break;
+	case EFFECTcat:
+		this->proxyShape->setCollideWithMaskBits(0);
+		break;
+	case RUBBISHcat:
+		proxyShape->setCollideWithMaskBits(ALLcats);
+		break;
 
 	}
 }
 
-void BodyObj::setType(rp3d::BodyType type)
+int BodyObj::getCollsionCategory()
 {
-	body->setType(type);
-
-	/*switch (type)
-	{
-	case 0:	body->setType(rp3d::DYNAMIC); break;
-	case 1:	body->setType(rp3d::STATIC); break;
-	case 2: body->setType(rp3d::KINEMATIC); break;
-	}*/
+	return proxyShape->getCollisionCategoryBits();
 }
-
 void BodyObj::setMaterial(float bounce, float friction)
 {
 	rp3d::Material& material = body->getMaterial();
@@ -177,7 +198,33 @@ void BodyObj::modelInit(char *mesh, char *texture)
 {
 	model = new Model();
 	model->Initialize(mesh, texture);
+}
+
+void BodyObj::modelInit(Model *model)
+{
+	this->model = model;
+}
+
+void BodyObj::kill()
+{
+	//body->setType(rp3d::KINEMATIC);
+	
+	rp3d::Transform t = body->getTransform();
+	rp3d::Vector3 pos(0,4,0);
+	t.setPosition(pos);
+	body->setTransform(t);
+
+	rp3d::Vector3 stop(0, 0, 0);
+	body->setLinearVelocity(stop);
+	body->setAngularVelocity(stop);
+	setCollisionCategory(EFFECTcat);
 	int i = 0;
+}
+
+void BodyObj::init(rp3d::Vector3 position, rp3d::Quaternion orientation)
+{
+	rp3d::Transform t(position, orientation);
+	body->setTransform(t);
 }
 
 void BodyObj::setGravityEnable(bool arg)
@@ -200,12 +247,42 @@ bool BodyObj::getIsDeleted()
 	return IsDeleted;
 }
 
+void BodyObj::setIsDeleted(bool arg)
+{
+	IsDeleted = arg;
+}
+
 bool BodyObj::getOneParticles()
 {
 	return OneParticles;
 }
 
+bool BodyObj::getOneSplash()
+{
+	return OneSplash;
+}
+
 void BodyObj::setOneParticles(bool arg)
 {
 	OneParticles = arg;
+}
+
+void BodyObj::setOneSplash(bool arg)
+{
+	OneSplash = arg;
+}
+
+void BodyObj::setType(rp3d::BodyType type)
+{
+	body->setType(type);
+}
+
+rp3d::BodyType BodyObj::getType()
+{
+	return body->getType();
+}
+
+rp3d::CollisionShape * BodyObj::getShape()
+{
+	return shape;
 }

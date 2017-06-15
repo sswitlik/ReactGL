@@ -1,10 +1,12 @@
 #pragma once
+#include "stdafx.h"
 #include "reactphysics3d.h"
 #include "Camera.h"
 #include "BodyObj.h"
 #include "Arrow.h"
 //#include "Game.h"
 #include "Skydome.h"
+#include "Level.h"
 
 class Player
 {
@@ -21,7 +23,7 @@ public:
 	void move2(Direction dir);
 	void rotate2(Direction dir, float angle);
 	void look_vertical(float angle);
-	Arrow * test_shoot();
+	BodyObj * test_shoot();
 
 	//DRAWING
 	void Draw();
@@ -30,6 +32,9 @@ public:
 
 	//ATTRIBUTE SETTING
 	void ImproveAccuracy(int plusAccuracy);
+
+	//LEVEL
+	void loadLevel(Level *level);
 
 	//void set();
 	Camera cam;
@@ -66,6 +71,9 @@ public:
 
 	//SKYDOME
 	CSkydome *sky;
+
+	//LEVEL
+	Level *level;
 };
 
 

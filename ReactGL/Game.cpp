@@ -4,7 +4,7 @@
 #include "Arrow.h"
 #include "maths.h"
 
-//#define PI_2 1.57079632679
+extern int garbage;
 
 Game::Game()
 {
@@ -14,9 +14,6 @@ Game::Game()
 	//TIME
 	previousFrameTime = 0;
 	accumulator = 0;
-
-	//LEVEL
-	level = new LevelStraightFall();
 	
 	//START WORLD
 	//ExampleTestInit();
@@ -28,6 +25,7 @@ Game::Game()
 	rp3d::Vector3 shapeData(0.25, 1, 0.25);
 
 	player = new Player(World, initPosition, initOrientation, shapeData);
+	player->loadLevel(level);
 
 	//CONTACT 
 	listener = new GameEventListener(World,&effects);
@@ -51,14 +49,38 @@ Game::~Game()
 	{
 		delete obj;
 	}
+	for (auto *obj : GarbageCollector)
+	{
+		delete obj;
+	}
+
+	delete AimBonusModel;
+	delete Rock1Model;
+	delete Rock2Model;
+	delete ArrowModel;
+	delete WaterModel;
+	delete BirdModel;
 }
 
 void Game::InitLevel()
 {
+	//MODELS
+	AimBonusModel = new Model();
+	AimBonusModel->Initialize("Models/AimBonus.obj", "Models/AimBonus.bmp");
+	Rock1Model = new Model();
+	Rock1Model->Initialize("Models/Rock1.obj", "Models/RockTex.bmp");
+	Rock2Model = new Model();
+	Rock2Model->Initialize("Models/Rock2.obj", "Models/RockTex.bmp");
+	ArrowModel = new Model();
+	ArrowModel->Initialize("Models/Arrow3.obj", "Models/Rock.bmp");
+	WaterModel = new Model();
+	WaterModel->Initialize("Models/Water.obj", "Models/Water.bmp");
+	SandModel = new Model();
+	SandModel->Initialize("Models/Sand.obj", "Models/Sand.bmp");
+
 	//WORLD
 	rp3d::Vector3 gravity(0.0, -9.81, 0.0);
 	World = new rp3d::DynamicsWorld(gravity);
-
 	World->setNbIterationsVelocitySolver(15);
 	World->setNbIterationsPositionSolver(8);
 
@@ -67,69 +89,33 @@ void Game::InitLevel()
 	rp3d::Quaternion initOrientation;
 	rp3d::Vector3 shapeData;
 
+	int bottomSize = LevelLength + 200;
 	//BOTTOM RUBBISH
-	initPosition.setAllValues(0, -4, 200);
+	initPosition.setAllValues(0, -4, LevelLength/2);
 	initOrientation = rp3d::Quaternion::identity();
-	shapeData.setAllValues(50, 1, 250);
-	auto bottom = new Water(this->World, initPosition, initOrientation, shapeData, 1);
+	shapeData.setAllValues(50, 1, bottomSize/2);
+	auto bottom = new Rubbish(this->World, initPosition, initOrientation, shapeData, 1);
 	bottom->setType(rp3d::STATIC);
 	bottom->setMaterial(0, 1);
 	bottom->setCollisionCategory(RUBBISHcat);
+	bottom->modelInit(SandModel);
 	map.push_back(bottom);
 
 	//WATER
-	for (int i = 0; i < 3; i++)
-	{
-		for (int j = 0; j < 40; j++)
-		{
-			initPosition.setAllValues(i*4-4, 0, j*4-4);
-			initOrientation = rp3d::Quaternion::identity();
-			shapeData.setAllValues(2, 1, 2);
-			auto water = new Water(this->World, initPosition, initOrientation, shapeData, 1);
-			water->setType(rp3d::STATIC);
-			water->setMaterial(0, 1);
-			water->setCollisionCategory(RUBBISHcat);
-			map.push_back(water);
-		}
-	}
+	initPosition.setAllValues(0, 0, LevelLength/2);
+	initOrientation = rp3d::Quaternion::identity();
+	shapeData.setAllValues(50, 1, bottomSize/2);
+	auto water = new Water(this->World, initPosition, initOrientation, shapeData, 1);
+	water->setType(rp3d::STATIC);
+	water->setMaterial(0, 1);
+	water->setCollisionCategory(WATERcat);
+	water->modelInit(WaterModel);
+	map.push_back(water);
 
-	std::vector<BodyObj *> *bricks = new std::vector<BodyObj *>;
-	//FLOOR
-	for (int i = 0; i < 40; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			if (j%2)
-				initPosition.setAllValues(j-1, 3, i-1);
-			else
-				initPosition.setAllValues(j - 1, 3, i-1+0.5);
-			initOrientation = rp3d::Quaternion::identity();
-			shapeData.setAllValues(0.45, 0.3, 0.45);
-			auto brick = new BodyObj(this->World, initPosition, initOrientation, shapeData, 1);
-			brick->setType(rp3d::STATIC);
-			brick->setMaterial(0, 1);
-			//brick->setCollisionCategory(MAPcat);
-			brick->setCollisionCategory(FREEcat);
-			if (rand() % 2)
-				brick->modelInit("Models/MyRock2.obj", "Models/MyRockTex.bmp");
-			else 
-				brick->modelInit("Models/MyRock.obj", "Models/MyRockTex.bmp");
-			bricks->push_back(brick);
-			map.push_back(brick);
-		}
-	}
-	level->getData(bricks);
-
-	//AIMS
-	initPosition.setAllValues(0, 4, 6);
-	rp3d::Quaternion initOrientRotated(0, 0, PI_2);
-	//shapeData.setAllValues(0.2, 1, 1);
-	auto aim = new Aim(this->World, initPosition, initOrientRotated, new rp3d::CylinderShape(1,0.2,0.1), 1);
-	aim->setType(rp3d::STATIC);
-	aim->setMaterial(0, 1);
-	aim->setCollisionCategory(MAPcat);
-	aim->modelInit("Models/AimBonus.obj", "Models/AimBonus.bmp");
-	map.push_back(aim);
+	//LEVEL
+	level = new LevelStraightFall(World, &map, &objs);
+	level->getModels(Rock1Model, Rock2Model, AimBonusModel, ArrowModel);
+	level->Initialize();
 
 }
 
@@ -170,20 +156,108 @@ void Game::ExampleTestInit()
 	map.push_back(obj1);
 }
 
+void Game::Draw()
+{
+	level->Draw();
+}
+
 void Game::Update()
 {
-	//Clear the garbage
-	for (auto i = GarbageCollector.begin(); i<GarbageCollector.end(); i++)
+	static int loolTime = 0;
+	//printf("%d\n", loolTime);
+	garbage = GarbageCollector.size();
+	//Clear the Garbage v2
+/*
+	if (GarbageCollector.size() > 5)
 	{
-		rp3d::ProxyShape *toDeleteProxy = (*i)->getProxyShape();
-		rp3d::RigidBody *toDeleteBody = (*i)->getBody();
-		//toDeleteBody->removeCollisionShape(toDeleteProxy);
-		World->destroyRigidBody(toDeleteBody);
-		delete (*i);
-		(*i) = NULL;
-		int j = 0;
+		//COPYING WORLD
+		rp3d::Vector3 gravity(0, -9.81, 0);
+		rp3d::DynamicsWorld *newWorld = new rp3d::DynamicsWorld(gravity);
+		
+		rp3d::RigidBody *newBody;
+		rp3d::Transform newTransform;
+		rp3d::Transform identityTransform = rp3d::Transform::identity();
+		rp3d::ProxyShape *newProxy;
+		rp3d::CollisionShape *newShape;
+		rp3d::decimal newMass;
+		for (auto *i : objs)
+		{
+			rp3d::RigidBody *tmpBody = i->getBody();
+			newTransform = tmpBody->getTransform();
+			newBody = newWorld->createRigidBody(newTransform);
+
+			newShape = i->getShape();
+			newMass = tmpBody->getMass();
+			if (newMass < 0.0000001)
+				newMass = rp3d::decimal(1.0);
+			newProxy = newBody->addCollisionShape(newShape, identityTransform, newMass);
+			i->setType(tmpBody->getType());
+			newProxy->setUserData(i);
+			i->setCollisionCategory(i->getCollsionCategory());
+			//---------------
+			World->destroyRigidBody(tmpBody);
+		}
+		for (auto *i : map)
+		{
+			rp3d::RigidBody *tmpBody = i->getBody();
+			newTransform = tmpBody->getTransform();
+			newBody = newWorld->createRigidBody(newTransform);
+
+			newShape = i->getShape();
+			newMass = tmpBody->getMass();
+			if (newMass < 0.0000001)
+				newMass = rp3d::decimal(1.0);
+			newProxy = newBody->addCollisionShape(newShape, identityTransform, newMass);
+			i->setType(tmpBody->getType());
+			newProxy->setUserData(i);
+			i->setCollisionCategory(i->getCollsionCategory());
+			//---------------
+			World->destroyRigidBody(tmpBody);
+		}
+		for (auto *i : effects)
+		{
+			rp3d::RigidBody *tmpBody = i->getBody();
+			newTransform = tmpBody->getTransform();
+			newBody = newWorld->createRigidBody(newTransform);
+
+			newShape = i->getShape();
+			newMass = tmpBody->getMass();
+			newProxy = newBody->addCollisionShape(newShape, identityTransform, newMass);
+			newProxy->setUserData(i);
+			i->setCollisionCategory(i->getCollsionCategory());
+			//---------------
+			World->destroyRigidBody(tmpBody);
+		}
+		//DELETING OLD WORLD
+		for (auto *i : objs)
+		{
+			rp3d::RigidBody *tmpBody = i->getBody();
+			World->destroyRigidBody(tmpBody);
+		}
+		for (auto *i : map)
+		{
+			rp3d::RigidBody *tmpBody = i->getBody();
+			World->destroyRigidBody(tmpBody);
+		}
+		for (auto *i : effects)
+		{
+			rp3d::RigidBody *tmpBody = i->getBody();
+			World->destroyRigidBody(tmpBody);
+		}
+		//CHANGE TO NEW
+		World = newWorld;
+
 	}
-	GarbageCollector.clear();
+*/
+	////Clear the garbage
+/*if (GarbageCollector.size() > 10)
+	{
+		for (auto i = GarbageCollector.begin(); i < GarbageCollector.end(); i++)
+		{
+			delete (*i);
+		}
+		GarbageCollector.clear();
+	}*/
 
 
 	///TIME UPDATE
@@ -205,6 +279,9 @@ void Game::Update()
 	int t1 = glutGet(GLUT_ELAPSED_TIME);		// While there is enough accumulated time to take one or several physics steps 
 	while (accumulator >= timeStep2) {
 
+		//test
+		loolTime += 1;
+
 		World->update(timeStep);				// Update the Dynamics world with a constant time step 
 
 		player->update();
@@ -212,12 +289,16 @@ void Game::Update()
 		float tmStp = timeStep;
 		level->Update(tmStp);
 
+/*
 		for (auto i = map.begin(); i < map.end(); )
 		{
 			if ((*i)->getIsDeleted())
 			{
-				delete (*i);
+				GarbageCollector.push_back(*i);
+				(*i)->kill();
+				auto x = (*i);
 				i = map.erase(i);
+				//delete x;
 			}
 			else
 			{
@@ -230,8 +311,12 @@ void Game::Update()
 		{
 			if ((*i)->getIsDeleted())
 			{
-				//delete (x);
+				GarbageCollector.push_back(*i);
+				(*i)->kill();
+				auto x = (*i);
 				i = objs.erase(i);
+				//i++;
+				//delete x;
 			}
 			else
 			{
@@ -240,20 +325,26 @@ void Game::Update()
 			}
 
 		}
+		int k = 0;
 		for (auto i = effects.begin(); i < effects.end(); )
 		{
 			if ((*i)->getIsDeleted())
 			{
-				delete (*i);
+				//GarbageCollector.push_back(*i);
+				//(*i)->kill();
+				auto x = (*i);
 				i = effects.erase(i);
+				delete x;
 			}
 			else
 			{
 				(*i)->update();
 				i++;
 			}
+				k++;
 
 		}
+*/
 		
 		accumulator -= timeStep2;				// Decrease the accumulated time 
 	}
@@ -271,8 +362,8 @@ void Game::plus()
 	initOrientation = rp3d::Quaternion::identity();
 	shapeData.setAllValues(0.5, 0.5, 0.5);
 	BodyObj *obj = new BodyObj(this->World, initPosition, initOrientation, shapeData, 10);
-	obj->setMaterial(0.01, 0.2);
-	obj->modelInit("Models/MyRock.obj", "Models/MyRockTex.bmp");
+	obj->setMaterial(0.6, 0.2);
+	//obj->modelInit("Models/MyRock.obj", "Models/MyRockTex.bmp");
 	objs.push_back(obj);
 }
 
@@ -283,8 +374,8 @@ Player * Game::getplayer()
 
 void Game::testshoot()
 {
-	Arrow *b = player->test_shoot();
-	objs.push_back(b);
+	player->test_shoot();
+	//objs.push_back(b);
 }
 
 Events Game::getEvents()

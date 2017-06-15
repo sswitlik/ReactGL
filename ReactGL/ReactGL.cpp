@@ -5,6 +5,8 @@
 #include "Model.h"
 #include "Events.h"
 
+int garbage;
+
 Game *game;
 Camera cam;
 Player *player;
@@ -15,6 +17,18 @@ int mx, my;
 bool keystate[256];
 //Screen
 int screenHeight = 600, screenWidth = 800;
+
+void DrawString(GLfloat x, GLfloat y, char * string)
+{
+	// po³o¿enie napisu
+	glRasterPos2f(x, y);
+
+	// wyœwietlenie napisu
+	int len = strlen(string);
+	for (int i = 0; i < len; i++)
+		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
+
+}
 
 void Display()
 {
@@ -30,6 +44,7 @@ void Display()
 	player->Draw();
 	float matrix[16];
 
+	game->Draw();
 	////PLAYER
 	//glPushMatrix();
 	//player->Draw(matrix);
@@ -42,20 +57,20 @@ void Display()
 	//glPopMatrix();
 	//player->Draw();
 
-	for (auto *i : game->effects)
-	{
-		i->Draw();
-	}
+	//for (auto *i : game->effects)
+	//{
+	//	i->Draw();
+	//}
 
 	for (auto *i : game->map)
 	{
 		i->Draw();
 	}
 
-	for (auto *i : game->objs)
-	{
-		i->Draw();
-	}
+	//for (auto *i : game->objs)
+	//{
+	//	i->Draw();
+	//}
 
 	#pragma region 2D
 	{
@@ -78,6 +93,8 @@ void Display()
 		player->Drawsight(screenWidth / 2, screenHeight / 2);
 		player->DrawShootPower(screenWidth / 2, screenHeight);
 
+		glColor3b(0, 0, 0);
+		DrawString(garbage, 15, "O");
 		//
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
@@ -107,7 +124,7 @@ void Reshape(int width, int height)
 		aspect = width / (GLdouble)height;
 
 	// rzutowanie perspektywiczne
-	gluPerspective(90, aspect, 0.1, 30.0);
+	gluPerspective(90, aspect, 0.1, 60.0);
 
 	Display();
 }
@@ -189,7 +206,8 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	switch (key)
 	{
 	case 27:
-		exit(0);
+		//exit(0);
+		break;
 	}
 
 	Display();
@@ -259,24 +277,47 @@ void EntryFunc(int state)
 
 int main(int argc, char * argv[])
 {
-	//rp3d::Vector3 gr(0, -10, 0);
-	//rp3d::DynamicsWorld *world = new rp3d::DynamicsWorld(gr);
+/*
+	rp3d::Vector3 vec(0, -10, 0);
+	rp3d::DynamicsWorld *world = new rp3d::DynamicsWorld(vec);
 
-	//rp3d::Vector3 initPosition;
-	//rp3d::Quaternion initOrientation;
-	//rp3d::Vector3 shapeData(1,1,1);
-	//
-	//initPosition.setAllValues(0, -4, 200);
-	//initOrientation = rp3d::Quaternion::identity();
-	//rp3d::Transform transform(initPosition, initOrientation);
-	//rp3d::RigidBody *body = world->createRigidBody(transform);
+	rp3d::RigidBody *b1 = NULL;
+	rp3d::ProxyShape *p1 = NULL;
+	rp3d::CollisionShape *s1 = NULL;
 
-	//rp3d::BoxShape *shape = new rp3d::BoxShape(shapeData, 0.1);
-	//rp3d::Transform transform2 = rp3d::Transform::identity();
-	//rp3d::ProxyShape *proxy = body->addCollisionShape(shape, transform2, 2);
+	vec.setAllValues(0, 0, 0);
+	rp3d::Quaternion q(0, 0, 0);
+	rp3d::Transform t;
+	b1 = world->createRigidBody(t);
 
-	//world->destroyRigidBody(body);
-	//int i = 0;
+	rp3d::decimal r = rp3d::decimal(0.5);
+	s1 = new rp3d::SphereShape(r);
+	t = rp3d::Transform::identity();
+	rp3d::decimal mass = rp3d::decimal(4.0);
+	p1 = b1->addCollisionShape(s1, t, mass);
+
+	rp3d::RigidBody *b2 = NULL;
+	rp3d::ProxyShape *p2 = NULL;
+	rp3d::CollisionBody *s2 = NULL;
+
+	vec.setAllValues(0, 0, 0);
+	t.setPosition(vec);
+	b2 = world->createRigidBody(t);
+	b2->setType(rp3d::STATIC);
+	p2 = b2->addCollisionShape(s1, t, mass);
+
+	////delete p1;
+	//b1->removeCollisionShape(p1);
+	////delete b1;
+	//world->destroyRigidBody(b1);
+	
+	world->update(0.1);
+
+	delete world;
+
+	delete s1;
+*/
+
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -298,12 +339,26 @@ int main(int argc, char * argv[])
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_DEFAULT);
 	//TIMER
 	glutTimerFunc(17, OnTimer, 0);
-
 	glutIdleFunc(Idle);
+
+	//FOG
+	glEnable(GL_FOG);
+	float gl_fogcolor[] = { 0.875f, 0.957f, 1.0f, 1.0f };
+	glFogi(GL_FOG_MODE, GL_LINEAR);
+	glFogfv(GL_FOG_COLOR, gl_fogcolor);
+	glFogf(GL_FOG_START, 6.0f);
+	glFogf(GL_FOG_END, 24.0f);
+
+	
+
 
 	game = new Game();
 
 	glutMainLoop();
 	
+	printf("lol");
+
+	delete game;
+
 	return 0;
 }

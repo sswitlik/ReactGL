@@ -33,6 +33,9 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	//DRAWING
 	model = NULL;
 
+	//LEVEL INITIALIZATION
+	body->setType(rp3d::STATIC);
+
 	time = 0;
 	collided = false;
 	drilled = false;
@@ -168,15 +171,15 @@ void Arrow::makeCollision(BodyObj *CollideWith)
 		for (int i = 0; i < 3; i++)
 		{
 			int x = rand() % 30000 - 15000,
-				y = rand() % 30000 - 15000,
+				y = rand() % 40000 - 15000,
 				z = rand() % 30000 - 15000;
 			rp3d::Vector3 force(x, y, z);
-			rp3d::Vector3 col(0.5, 0, 0);
+			rp3d::Vector3 col(126, 0, 0);
 			Particle *partic = new Particle(gameWorld, pos, 0.02, col);
 			partic->setMaterial(0.5, 0.1);
 			partic->giveForce(force);
 			partic->setCollisionCategory(EFFECTcat);
-			if (game->effects.size() < 15)
+			if (game->effects.size() < 90)
 				game->effects.push_back(partic);
 			setOneParticles(false);
 		}

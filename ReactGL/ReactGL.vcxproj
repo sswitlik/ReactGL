@@ -115,11 +115,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Programowanie\biblioteki\freeglutMSVC\freeglut\include;C:\Programowanie\react3d\reactphysics3d\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Programowanie\biblioteki\freeglutMSVC\freeglut\lib;C:\Users\Olek\AppData\Local\CMakeBuild\ed96f3e0-7449-6d3f-b855-15777f98210c\build\x86-Debug\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;reactphysics3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,6 +157,7 @@
     <ClInclude Include="maths.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Rock.h" />
     <ClInclude Include="Rubbish.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="stdafx.h" />
@@ -178,6 +182,7 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ReactGL.cpp" />
+    <ClCompile Include="Rock.cpp" />
     <ClCompile Include="Rubbish.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="stdafx.cpp">

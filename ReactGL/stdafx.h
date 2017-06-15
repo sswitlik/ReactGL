@@ -12,6 +12,7 @@
 #include <tchar.h>
 #include <GL\freeglut.h>
 #include <reactphysics3d.h>
+#include <deque>
 #include "Arrow.h"
 #include "BodyObj.h"
 #include "Camera.h"
@@ -27,5 +28,7 @@
 #include "Aim.h"
 #include "Events.h"
 #include "Particle.h"
+#include "Rubbish.h"
+#include "Rock.h"
 
 // TODO: W tym miejscu odwo³aj siê do dodatkowych nag³ówków wymaganych przez program

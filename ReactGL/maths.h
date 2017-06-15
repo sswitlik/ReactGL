@@ -10,6 +10,7 @@
 #define PIx2 6.28318530717
 
 const float timeStep = 0.016;
+const int LevelLength = 500;	//lepiej niech bedzie %4
 
 enum Category {
 	PLAYERcat = 0x0001,
@@ -18,6 +19,7 @@ enum Category {
 	EFFECTcat = 0x008,
 	FREEcat = 0x0010,
 	RUBBISHcat = 0x0020,
+	WATERcat = 0x0040,
 
 	ALLcats = 0xFFFF
 };
