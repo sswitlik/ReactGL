@@ -47,7 +47,7 @@ void Model::Render(void)
 	glBindTexture(GL_TEXTURE_2D, teksturaModelu->GetId());
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	//GL MODULATE
+	//GL MODULATE	GL_REPLACE
 	glCallList(idModelu);
 
 	glDisable(GL_TEXTURE_2D);

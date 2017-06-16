@@ -64,9 +64,9 @@ void Water::makeCollision(BodyObj *CollideWith)
 		auto pos = collBody->getTransform().getPosition();
 		for (int i = 0; i < 7; i++)
 		{
-			int x = rand() % 10000,
+			int x = rand() % 20000 - 10000,
 				y = rand() % 20000 + 60000,
-				z = rand() % 10000;
+				z = rand() % 20000 - 10000;
 			rp3d::Vector3 force(x, y, z);
 			rp3d::Vector3 col(0, 0, 0);
 			int randColor = rand() % 6;
@@ -88,13 +88,23 @@ void Water::makeCollision(BodyObj *CollideWith)
 				col.setAllValues(217, 244, 251);
 				break;
 			}
-			Particle *partic = new Particle(gameWorld, pos, 0.02, col);
+			//Particle *partic = new Particle(gameWorld, pos, 0.02, col);
+			auto partic = game->getLevel()->Make("effect", pos, rp3d::Quaternion::identity());
+
+			partic->getColor(col);
 			partic->setMaxTime(80);
 			partic->setMaterial(0.5, 0.1);
-			partic->giveForce(force);
+			auto tmpBody = partic->getBody();
+			tmpBody->applyForceToCenterOfMass(force);
 			partic->setCollisionCategory(EFFECTcat);
-			if (game->effects.size() < 60)
-				game->effects.push_back(partic);
+
+			x = rand() % 20 - 10;
+			y = rand() % 20 - 10;
+			z = rand() % 20 - 10;
+			force.setAllValues(x, y, z);
+			tmpBody->applyTorque(force);
+			//if (game->effects.size() < 60)
+			//	game->effects.push_back(partic);
 
 			CollideWith->setOneSplash(false);
 			int asfa = 0;

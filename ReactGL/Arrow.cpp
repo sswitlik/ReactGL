@@ -97,12 +97,12 @@ void Arrow::Draw()
 
 void Arrow::update()
 {
-	// bylo potrzebne przed collision filtering
-	//if (time < 25 && !collided) 
-	//{
-	//	time++;		//allow collision after 25
-	//	return;
-	//}
+	////bylo potrzebne przed collision filtering
+	if (time < 3 && !collided) 
+	{
+		time++;		//allow collision after 25
+		return;
+	}
 
 	if (drilled)	
 	{
@@ -128,7 +128,7 @@ void Arrow::update()
 		double y;
 		double z;
 
-		
+		float pi2 = 180/PI;
 		QuaternionO2IToEulerAngles(&x, &y, &z, q);
 
 		if (antivibr)	//if falling
@@ -140,10 +140,13 @@ void Arrow::update()
 		//printf("%f %f %f\n", x, y, z);
 
 		//y from speed
+		float XZLength = sqrt(1 - speed.y*speed.y);
+
 		speed.normalize();
+
 		y = acos(speed.y);
 
-		rp3d::Vector3 angsp = body->getAngularVelocity();	//angle speed
+		//rp3d::Vector3 angsp = body->getAngularVelocity();	//angle speed
 
 		rp3d::Quaternion newq(x, y, z);
 
@@ -168,19 +171,32 @@ void Arrow::makeCollision(BodyObj *CollideWith)
 		rp3d::Vector3 vel = body->getLinearVelocity();
 		vel.normalize();
 		pos += vel / 4;
-		for (int i = 0; i < 3; i++)
+		rp3d::Vector3 col[5];
+		col[0].setAllValues(180, 0, 0);
+		col[1].setAllValues(180, 0, 0);
+		col[2].setAllValues(110, 61, 29);
+		col[3].setAllValues(110, 61, 29);
+		col[4].setAllValues(78, 86, 99);
+		for (int i = 0; i < 5; i++)
 		{
 			int x = rand() % 30000 - 15000,
-				y = rand() % 40000 - 15000,
+				y = rand() % 10000 + 30000,
 				z = rand() % 30000 - 15000;
 			rp3d::Vector3 force(x, y, z);
-			rp3d::Vector3 col(126, 0, 0);
-			Particle *partic = new Particle(gameWorld, pos, 0.02, col);
+			//Particle *partic = new Particle(gameWorld, pos, 0.02, col);
+			auto partic = game->getLevel()->Make("effect", pos, rp3d::Quaternion::identity());
+			
 			partic->setMaterial(0.5, 0.1);
-			partic->giveForce(force);
+			auto tmpBody = partic->getBody();
+			tmpBody->applyForceToCenterOfMass(force);
 			partic->setCollisionCategory(EFFECTcat);
-			if (game->effects.size() < 90)
-				game->effects.push_back(partic);
+			partic->getColor(col[i]);
+			
+			x = rand() % 20 - 10;
+			y = rand() % 20 - 10;
+			z = rand() % 20 - 10;
+			force.setAllValues(x, y, z);
+			tmpBody->applyTorque(force);
 			setOneParticles(false);
 		}
 	}
@@ -200,6 +216,16 @@ void Arrow::makeCollision(BodyObj *CollideWith)
 	}
 	else
 		collided = true;
+}
+
+void Arrow::init(rp3d::Vector3 position, rp3d::Quaternion orientation)
+{
+	BodyObj::init(position, orientation);
+	body->enableGravity(true);
+	collided = false;
+	drilled = false;
+	antivibr = false;
+	setCollisionCategory(ARROWcat);
 }
 
 void Arrow::setGravityEnable(bool arg)

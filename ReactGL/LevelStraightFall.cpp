@@ -35,6 +35,10 @@ LevelStraightFall::~LevelStraightFall()
 
 void LevelStraightFall::Update(float plusTime)
 {
+	//rp3d::Vector3 v(10, 2, 0);
+	//Make("effect", v, rp3d::Quaternion::identity());
+	printf("%d %d\n", effectVec.size(), effectCont.size());
+
 	mapUpdate();
 
 	float timeHz = 0.4;
@@ -118,19 +122,27 @@ void LevelStraightFall::getData(std::vector<BodyObj *> *toServe)
 
 void LevelStraightFall::Initialize()
 {
-
 	Prepare();
 	rp3d::Vector3 initPosition;
 	rp3d::Quaternion initOrientation;
 	rp3d::Vector3 shapeData;
 
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		initPosition.setAllValues(0, 1, i);
-		initOrientation = rp3d::Quaternion::identity();
-		Make("rock", initPosition, initOrientation);
+		for (int j = 0; j < 20; j++)
+		{
+			initPosition.setAllValues(j, 1, i);
+			initOrientation = rp3d::Quaternion::identity();
+			auto obj = Make("rock", initPosition, initOrientation);
+			obj->setMaxTime(j+20);
+		}
 	}
+
+	initPosition.setAllValues(2, 3, 2);
+	initOrientation = rp3d::Quaternion::identity();
+	BodyObj * obj = Make("rock", initPosition, initOrientation);
+	obj->setMaxTime(3);
 	/*
 	for (int i = 0; i < 16; i++)
 	{
@@ -202,7 +214,7 @@ void LevelStraightFall::Prepare()
 	}
 
 	//ARROWS
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		auto obj = new Arrow(world, zeroVector, zeroQuaternion, 0.05, 0.5, 2);
 		arrowCont.push_back(obj);
@@ -213,12 +225,12 @@ void LevelStraightFall::Prepare()
 	rp3d::Vector3 rockShape(0.45, 0.3, 0.45);
 	for (int i = 0; i < 200; i++)
 	{
-		auto obj = new Rock(world, zeroVector, zeroQuaternion, rockShape, 100);
+		auto obj = new Rock(world, zeroVector, zeroQuaternion, rockShape, 10);
 		rockCont.push_back(obj);
 		if (rand() % 2)
-			obj->modelInit(Rock1Model);
+			;//obj->modelInit(Rock1Model);
 		else
-			obj->modelInit(Rock2Model);
+			;//obj->modelInit(Rock2Model);
 	}
 
 	//AIMS
@@ -258,6 +270,7 @@ BodyObj * LevelStraightFall::Make(char *type, rp3d::Vector3 initPosition, rp3d::
 		if (effectCont.size() > 0)
 		{
 			obj = effectCont.back();
+			obj->setType(rp3d::DYNAMIC);
 			obj->init(initPosition, initOrientation);
 			effectVec.push_back(obj);
 			effectCont.pop_back();
@@ -265,6 +278,7 @@ BodyObj * LevelStraightFall::Make(char *type, rp3d::Vector3 initPosition, rp3d::
 		else
 		{
 			obj = effectVec.front();
+			obj->setType(rp3d::DYNAMIC);
 			obj->init(initPosition, initOrientation);
 			effectVec.pop_front();
 			effectVec.push_back(obj);
@@ -301,52 +315,56 @@ void LevelStraightFall::Kill(BodyObj *obj, char *type)
 	if (type == "arrow")
 	{
 		auto it = arrowVec.begin();
-		while (it != arrowVec.end())
-		{
-			it++;
-		}
-		it--;
+		while ((*it) != obj)
 
-		if (arrowVec.size() > 0)
-		{
-			arrowVec.erase(it);
-			obj->setType(rp3d::STATIC);
-			obj->init(zeroPosition, zeroOrientation);
-			arrowCont.push_back(obj);
-			obj->setIsDeleted(false);
-		}
-		else
-		{
-			;
-		}
+			it++;
+
+		arrowVec.erase(it);
+		obj->setType(rp3d::STATIC);
+		obj->init(zeroPosition, zeroOrientation);
+		arrowCont.push_back(obj);
+		obj->setIsDeleted(false);
 	}
 	else
 	if (type == "effect")
 	{
 		auto it = effectVec.begin();
-		while (it != effectVec.end())
-		{
+		while ((*it) != obj)
 			it++;
-		}
-	
-		if (effectCont.size() > 0)
-		{
-			effectVec.erase(it);
-			obj->setType(rp3d::STATIC);
-			obj->init(zeroPosition, zeroOrientation);
-			effectCont.push_back(obj);
-		}
-		else
-		{
-			;
-		}
+
+		effectVec.erase(it);
+		obj->setType(rp3d::STATIC);
+		obj->init(zeroPosition, zeroOrientation);
+		effectCont.push_back(obj);
+		obj->setIsDeleted(false);
+	}
+	else
+	if (type == "rock")
+	{
+		auto it = rockVec.begin();
+		while ((*it ) != obj)
+			it++;
+		
+		rockVec.erase(it);
+		obj->setType(rp3d::STATIC);
+		//obj->setCollisionCategory(EFFECTcat);
+		obj->init(zeroPosition, zeroOrientation);
+		rockCont.push_back(obj);
+		obj->setIsDeleted(false);
 	}
 }
 
 void LevelStraightFall::mapUpdate()
 {
-	for (auto *i : effectVec)
-		i->update();
+	for (int i = 0; i<effectVec.size(); i++)
+	{
+		if (effectVec[i]->getIsDeleted())
+			Kill(effectVec[i], "effect");
+		else
+		{
+			effectVec[i]->update();
+		}
+	}
 
 	for (int i=0; i<arrowVec.size();i++)
 	{
@@ -358,8 +376,15 @@ void LevelStraightFall::mapUpdate()
 		}
 	}
 
-	for (auto *i : rockVec)
-		i->update();
+	for (int i = 0; i<rockVec.size(); i++)
+	{
+		if (rockVec[i]->getIsDeleted())
+			Kill(rockVec[i], "rock");
+		else
+		{
+			rockVec[i]->update();
+		}
+	}
 
 	for (auto *i : aimVec)
 		i->update();

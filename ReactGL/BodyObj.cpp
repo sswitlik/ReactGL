@@ -28,7 +28,7 @@ BodyObj::BodyObj(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Q
 	proxyShape->setUserData(this);
 
 	//COLLISION FILTERING
-	setCollisionCategory(ARROWcat);
+	setCollisionCategory(FREEcat);
 	
 	//DRAWING
 	model = NULL;
@@ -125,7 +125,7 @@ void BodyObj::setCollisionCategory(Category cat)
 	switch (cat)
 	{
 	case FREEcat:
-		proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat | EFFECTcat | WATERcat | RUBBISHcat);
+		proxyShape->setCollideWithMaskBits(WATERcat | RUBBISHcat);
 		break;
 	case MAPcat:
 		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat | WATERcat | RUBBISHcat);
@@ -134,12 +134,14 @@ void BodyObj::setCollisionCategory(Category cat)
 		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		this->proxyShape->setCollideWithMaskBits( 0 );
+		this->proxyShape->setCollideWithMaskBits( MAPcat );
 		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);
 		break;
-
+	case WATERcat:
+		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | ARROWcat);
+		break;
 	}
 }
 void BodyObj::setCollisionCategory(int cat)
@@ -148,7 +150,7 @@ void BodyObj::setCollisionCategory(int cat)
 	switch (cat)
 	{
 	case FREEcat:
-		proxyShape->setCollideWithMaskBits(PLAYERcat | ARROWcat | MAPcat | FREEcat | EFFECTcat | WATERcat | RUBBISHcat);
+		proxyShape->setCollideWithMaskBits(WATERcat | RUBBISHcat);
 		break;
 	case MAPcat:
 		proxyShape->setCollideWithMaskBits(MAPcat | PLAYERcat | EFFECTcat | ARROWcat | FREEcat | WATERcat | RUBBISHcat);
@@ -157,12 +159,14 @@ void BodyObj::setCollisionCategory(int cat)
 		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		this->proxyShape->setCollideWithMaskBits(0);
+		this->proxyShape->setCollideWithMaskBits(MAPcat);
 		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);
 		break;
-
+	case WATERcat:
+		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | ARROWcat);
+		break;
 	}
 }
 
@@ -181,6 +185,10 @@ void BodyObj::setMaterial(float bounce, float friction)
 void BodyObj::update()
 {
 
+}
+
+void BodyObj::setMaxTime(float max)
+{
 }
 
 void BodyObj::makeCollision(BodyObj *CollideWith)
@@ -210,7 +218,7 @@ void BodyObj::kill()
 	//body->setType(rp3d::KINEMATIC);
 	
 	rp3d::Transform t = body->getTransform();
-	rp3d::Vector3 pos(0,4,0);
+	rp3d::Vector3 pos(0,-4,0);
 	t.setPosition(pos);
 	body->setTransform(t);
 
@@ -225,6 +233,8 @@ void BodyObj::init(rp3d::Vector3 position, rp3d::Quaternion orientation)
 {
 	rp3d::Transform t(position, orientation);
 	body->setTransform(t);
+	OneSplash = true;
+	OneParticles = true;
 }
 
 void BodyObj::setGravityEnable(bool arg)
@@ -285,4 +295,8 @@ rp3d::BodyType BodyObj::getType()
 rp3d::CollisionShape * BodyObj::getShape()
 {
 	return shape;
+}
+
+void BodyObj::getColor(rp3d::Vector3 color)
+{
 }

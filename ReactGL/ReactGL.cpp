@@ -44,6 +44,7 @@ void Display()
 	player->Draw();
 	float matrix[16];
 
+
 	game->Draw();
 	////PLAYER
 	//glPushMatrix();
@@ -94,7 +95,7 @@ void Display()
 		player->DrawShootPower(screenWidth / 2, screenHeight);
 
 		glColor3b(0, 0, 0);
-		DrawString(garbage, 15, "O");
+		DrawString(20, 15, "O======");
 		//
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
@@ -320,9 +321,9 @@ int main(int argc, char * argv[])
 
 
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(screenWidth, screenHeight);
-	glutInitWindowPosition(5, 5);
+	glutInitWindowPosition(200, 5);
 	glutCreateWindow("LOL");
 	glutSetCursor(GLUT_CURSOR_NONE);
 
@@ -349,7 +350,22 @@ int main(int argc, char * argv[])
 	glFogf(GL_FOG_START, 6.0f);
 	glFogf(GL_FOG_END, 24.0f);
 
+	//ANTYALIASING
+	//glEnable(GLUT_MULTISAMPLE);
 	
+	//LIGHT
+	glEnable(GL_LIGHTING);
+	float gl_amb[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, gl_amb);
+
+	float l0_amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	float l0_dif[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float l0_spe[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float l0_pos[] = { -1.0f, 2, 0.5f, 0.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, l0_amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, l0_dif);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, l0_spe);
+	glLightfv(GL_LIGHT0, GL_POSITION, l0_pos);
 
 
 	game = new Game();

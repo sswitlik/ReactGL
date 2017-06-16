@@ -35,7 +35,7 @@ Particle::Particle(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, float
 //-------------------------------------------
 	this->color = color;
 
-	maxTime = 100;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
+	maxTime = 200;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
 	time = 0;
 	timeInSec = 0;
 
@@ -75,7 +75,7 @@ Particle::Particle(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, float
 //-------------------------------------------
 	this->color = color;
 
-	maxTime = 50;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
+	maxTime = 200;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
 	time = 0;
 	timeInSec = 0;
 
@@ -107,7 +107,7 @@ void Particle::Draw()
 	glPushMatrix();
 		glMultMatrixf(matrix);
 		glScalef(modelll.x, modelll.y, modelll.z);
-		//glColor3i(23, 171, 219);
+		//glColor3f(1,1,1);
 		glColor3ub (color.x,color.y,color.z);
 		glutSolidCube(1);
 	glPopMatrix();
@@ -135,6 +135,13 @@ void Particle::makeShards(int hmany, rp3d::Vector3 initPos)
 	}
 }
 
+void Particle::init(rp3d::Vector3 position, rp3d::Quaternion orientation)
+{
+	BodyObj::init(position, orientation);
+	time = 0;
+	maxTime = 100;
+}
+
 void Particle::giveForce(rp3d::Vector3 force)
 {
 	body->applyForceToCenterOfMass(force);
@@ -154,4 +161,9 @@ void Particle::setMaxTime(int max)
 void Particle::setQueueNumber(int numb)
 {
 	queueNumber = numb;
+}
+
+void Particle::getColor(rp3d::Vector3 color)
+{
+	this->color = color;
 }

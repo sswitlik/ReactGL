@@ -68,11 +68,11 @@ void Game::InitLevel()
 	AimBonusModel = new Model();
 	AimBonusModel->Initialize("Models/AimBonus.obj", "Models/AimBonus.bmp");
 	Rock1Model = new Model();
-	Rock1Model->Initialize("Models/Rock1.obj", "Models/RockTex.bmp");
+	Rock1Model->Initialize("Models/Rock1.obj", "Models/RockTex2.bmp");
 	Rock2Model = new Model();
-	Rock2Model->Initialize("Models/Rock2.obj", "Models/RockTex.bmp");
+	Rock2Model->Initialize("Models/Rock2.obj", "Models/RockTex2.bmp");
 	ArrowModel = new Model();
-	ArrowModel->Initialize("Models/Arrow3.obj", "Models/Rock.bmp");
+	ArrowModel->Initialize("Models/Arrow3.obj", "Models/Arrow2.bmp");
 	WaterModel = new Model();
 	WaterModel->Initialize("Models/Water.obj", "Models/Water.bmp");
 	SandModel = new Model();
@@ -386,4 +386,9 @@ Events Game::getEvents()
 rp3d::DynamicsWorld * Game::getWorld()
 {
 	return World;
+}
+
+Level * Game::getLevel()
+{
+	return level;
 }

@@ -20,5 +20,7 @@ public:
 	void giveForce(rp3d::Vector3 force);
 	void setQueueNumber(int numb);
 	void setCollisionCategory(Category cat);
+	void init(rp3d::Vector3 position, rp3d::Quaternion orientation);
+	void getColor(rp3d::Vector3 color);
 };
 

@@ -21,6 +21,7 @@ public:
 	void makeCollision(BodyObj *CollideWith);
 	void setGravityEnable(bool arg);
 	void pushToGravity();
+	void init(rp3d::Vector3 position, rp3d::Quaternion orientation);
 
 	float getDamage();
 };

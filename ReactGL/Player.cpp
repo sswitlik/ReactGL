@@ -48,7 +48,7 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	nextShotPower = 0;
 
 	//STATS
-	accuracy = 50;
+	accuracy = 1;
 	shootSpeed = 500;
 
 	//SKYDOME
@@ -537,7 +537,8 @@ BodyObj * Player::test_shoot()
 
 	float power = nextShotPower;
 	rp3d::Vector3 force(angleX * power, angleY * power, angleZ * power);
-	body->applyForceToCenterOfMass(force);
+	//body->applyForceToCenterOfMass(force);
+	body->setLinearVelocity(force/1000);
 
 	//bullet->BodyObj::modelInit("Models/arrow.obj", "Models/Rock.bmp");
 	//after shoot power to zero

@@ -69,7 +69,8 @@ void CSkydome::Render(void)
 {
 	glPushMatrix();
 
-	glTranslatef(Position.x, Position.y, Position.z);
+	glTranslatef(Position.x, 0, Position.z);
+	//glTranslatef(Position.x, Position.y, Position.z);
 	//glRotatef(Rotation.x, 1.0f, 0.0f, 0.0f);
 	//glRotatef(Rotation.y, 0.0f, 1.0f, 0.0f);
 	//glRotatef(Rotation.z, 0.0f, 0.0f, 1.0f);

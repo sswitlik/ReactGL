@@ -22,6 +22,7 @@ public:
 	virtual void makeCollision(BodyObj *CollideWith);
 	virtual void init(rp3d::Vector3 position, rp3d::Quaternion orientation);
 	virtual void kill();
+	virtual void setMaxTime(float max);
 
 	rp3d::RigidBody * getBody();
 	rp3d::ProxyShape * getProxyShape();
@@ -38,6 +39,9 @@ public:
 	void setType(rp3d::BodyType type);
 	rp3d::BodyType getType();
 	rp3d::CollisionShape * getShape();
+
+	//PARTICLE
+	virtual void getColor(rp3d::Vector3 color);
 protected:
 	rp3d::RigidBody *body;
 	rp3d::ProxyShape *proxyShape;

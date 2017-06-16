@@ -50,6 +50,8 @@ public:
 	void InitLevel();
 	void Draw();
 
+	Level * getLevel();
+
 	//PUBLIC GARBAGE COLLECTOR FOR ALL THE GAME
 	std::vector<BodyObj *> GarbageCollector;
 	
