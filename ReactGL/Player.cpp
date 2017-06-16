@@ -48,7 +48,7 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	nextShotPower = 0;
 
 	//STATS
-	accuracy = 1;
+	accuracy = 20;
 	shootSpeed = 500;
 
 	//SKYDOME
@@ -430,7 +430,19 @@ void Player::Draw()
 
 void Player::Drawsight(int xcentr, int ycentr)
 {
+	glEnable(GL_LINE_STIPPLE);
+	glLineStipple(4,0xAAAA);
+
 	float r = accuracy*2;
+
+	glColor4f(0.2f, 0.2f, 0.2f, 0.8);
+	glBegin(GL_LINES);
+		glVertex2f(xcentr - 50, ycentr);
+		glVertex2f(xcentr + 50, ycentr);
+		glVertex2f(xcentr, ycentr - 50);
+		glVertex2f(xcentr, ycentr + 50);
+	glEnd();
+
 	glColor4f(0.8f, 0.8f, 0.8, 0.3);
 	glBegin(GL_TRIANGLE_FAN);
 		glVertex2f(xcentr, ycentr);
@@ -443,13 +455,21 @@ void Player::Drawsight(int xcentr, int ycentr)
 		}
 	glEnd();
 
-	glColor4f(0.8f, 0.8f, 0.8f, 0.8);
-	glBegin(GL_LINES);
-		glVertex2f(xcentr - 50, ycentr);
-		glVertex2f(xcentr + 50, ycentr);
-		glVertex2f(xcentr, ycentr - 50);
-		glVertex2f(xcentr, ycentr + 50);
+
+	float r2 = r + 2;
+	glColor4f(0.2f, 0.2f, 0.2f, 0.8);
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(xcentr, ycentr);
+	Np = 48;
+	for (int i = 0; i <= Np; ++i) {
+		float x = sin(2.0f * PI * ((float)i / Np));
+		float y = cos(2.0f * PI * ((float)i / Np));
+		glVertex2f(xcentr + x*r2, ycentr + y*r2);
+
+	}
 	glEnd();
+
+
 }
 
 void Player::DrawShootPower(int xcentr, int ysize)

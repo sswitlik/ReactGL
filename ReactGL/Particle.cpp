@@ -35,7 +35,7 @@ Particle::Particle(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, float
 //-------------------------------------------
 	this->color = color;
 
-	maxTime = 200;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
+	maxTime = 100;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
 	time = 0;
 	timeInSec = 0;
 
@@ -75,7 +75,7 @@ Particle::Particle(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, float
 //-------------------------------------------
 	this->color = color;
 
-	maxTime = 200;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
+	maxTime = 100;		//maxTime*timeStep = timeInSeconds	//timeStep = 0.017 (13.06.2017)
 	time = 0;
 	timeInSec = 0;
 

@@ -8,6 +8,8 @@ extern  Game *game;
 Aim::Aim(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::Vector3 shapeData, rp3d::decimal mass)
 	: BodyObj(world, initPosition, initOrientation, shapeData, mass)
 {
+	rp3d::Quaternion q(0, 60, 0);
+	initOrientation = q;
 	lives = 2.9;
 	setType(rp3d::STATIC);
 }
@@ -60,7 +62,6 @@ void Aim::makeCollision(BodyObj *CollideWith)
 
 void Aim::update()
 {
-	
 	if (lives <= 0)
 		IsDeleted = true;
 }
@@ -89,11 +90,14 @@ void Aim::kill()
 	for (auto it = drilledIn.begin(); it < drilledIn.end(); it++)
 	{
 		(*it)->setGravityEnable(true);
-		(*it)->pushToGravity();
+		int x = rand() % 300 - 150,
+			y = rand() % 500 + 300,
+			z = rand() % 300 - 150;
+		rp3d::Vector3 force(x, y, z);
+		auto tmpBody = (*it)->getBody();
+		tmpBody->applyForce(force, tmpBody->getTransform().getPosition());
 	}
 
 	auto events = game->getEvents();
 	events.ImprovePlayerAccuracy(100);
-
-	BodyObj::kill();
 }

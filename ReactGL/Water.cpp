@@ -62,7 +62,7 @@ void Water::makeCollision(BodyObj *CollideWith)
 	{
 		auto collBody = CollideWith->getBody();
 		auto pos = collBody->getTransform().getPosition();
-		for (int i = 0; i < 7; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			int x = rand() % 20000 - 10000,
 				y = rand() % 20000 + 60000,

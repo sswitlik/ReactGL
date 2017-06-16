@@ -134,7 +134,7 @@ void BodyObj::setCollisionCategory(Category cat)
 		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		this->proxyShape->setCollideWithMaskBits( MAPcat );
+		this->proxyShape->setCollideWithMaskBits( 0 );
 		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);
@@ -159,7 +159,7 @@ void BodyObj::setCollisionCategory(int cat)
 		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		this->proxyShape->setCollideWithMaskBits(MAPcat);
+		this->proxyShape->setCollideWithMaskBits(0);
 		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);

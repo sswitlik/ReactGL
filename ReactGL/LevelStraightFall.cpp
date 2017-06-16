@@ -124,25 +124,38 @@ void LevelStraightFall::Initialize()
 {
 	Prepare();
 	rp3d::Vector3 initPosition;
-	rp3d::Quaternion initOrientation;
+	rp3d::Quaternion initOrientation = rp3d::Quaternion::identity();
+	rp3d::Quaternion cylinderOrientation(PI_2, 0, 0);
 	rp3d::Vector3 shapeData;
 
-
+	//START
 	for (int i = 0; i < 3; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < 10; j++)
 		{
-			initPosition.setAllValues(j, 1, i);
-			initOrientation = rp3d::Quaternion::identity();
+			initPosition.setAllValues(j, 2, i);
 			auto obj = Make("rock", initPosition, initOrientation);
-			obj->setMaxTime(j+20);
+			obj->setMaxTime(j*2+3);
 		}
 	}
 
-	initPosition.setAllValues(2, 3, 2);
-	initOrientation = rp3d::Quaternion::identity();
-	BodyObj * obj = Make("rock", initPosition, initOrientation);
-	obj->setMaxTime(3);
+	//AIM
+	{
+		initPosition.setAllValues(8, 3, 4);
+		auto obj = Make("aim", initPosition, cylinderOrientation);
+		obj->setMaxTime(50);
+	}
+
+	//META
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			initPosition.setAllValues(j + LevelLength, 2, i -1);
+			BodyObj * obj = Make("rock", initPosition, initOrientation);
+		}
+	}
+
 	/*
 	for (int i = 0; i < 16; i++)
 	{
@@ -207,7 +220,7 @@ void LevelStraightFall::Prepare()
 	rp3d::Quaternion zeroQuaternion(0, 0, 0);
 	
 	//EFFECTS
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 30; i++)
 	{
 		auto obj = new Particle(world, zeroVector, 0.02, zeroVector);
 		effectCont.push_back(obj);
@@ -228,13 +241,13 @@ void LevelStraightFall::Prepare()
 		auto obj = new Rock(world, zeroVector, zeroQuaternion, rockShape, 10);
 		rockCont.push_back(obj);
 		if (rand() % 2)
-			;//obj->modelInit(Rock1Model);
+			obj->modelInit(Rock1Model);
 		else
-			;//obj->modelInit(Rock2Model);
+			obj->modelInit(Rock2Model);
 	}
 
 	//AIMS
-	for (int i = 0; i < 0; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		auto obj = new Aim(world, zeroVector, zeroQuaternion, new rp3d::CylinderShape(1, 0.2, 0.1), 30);
 		aimCont.push_back(obj);
@@ -285,25 +298,45 @@ BodyObj * LevelStraightFall::Make(char *type, rp3d::Vector3 initPosition, rp3d::
 		}
 	}
 	else
-		if (type == "rock")
+	if (type == "rock")
+	{
+		if (rockCont.size() > 0)
 		{
-			if (rockCont.size() > 0)
-			{
-				obj = rockCont.back();
-				obj->init(initPosition, initOrientation);
-				obj->setCollisionCategory(MAPcat);
-				rockVec.push_back(obj);
-				rockCont.pop_back();
-			}
-			else
-			{
-				obj = rockVec.front();
-				obj->init(initPosition, initOrientation);
-				obj->setCollisionCategory(MAPcat);
-				rockVec.pop_front();
-				rockVec.push_back(obj);
-			}
+			obj = rockCont.back();
+			obj->init(initPosition, initOrientation);
+			obj->setCollisionCategory(MAPcat);
+			rockVec.push_back(obj);
+			rockCont.pop_back();
 		}
+		else
+		{
+			obj = rockVec.front();
+			obj->init(initPosition, initOrientation);
+			obj->setCollisionCategory(MAPcat);
+			rockVec.pop_front();
+			rockVec.push_back(obj);
+		}
+	}
+	else
+	if (type == "aim")
+	{
+		if (aimCont.size() > 0)
+		{
+			obj = aimCont.back();
+			obj->init(initPosition, initOrientation);
+			obj->setCollisionCategory(MAPcat);
+			aimVec.push_back(obj);
+			aimCont.pop_back();
+		}
+		else
+		{
+			obj = aimVec.front();
+			obj->init(initPosition, initOrientation);
+			obj->setCollisionCategory(MAPcat);
+			aimVec.pop_front();
+			aimVec.push_back(obj);
+		}
+	}
 
 	return obj;
 }
@@ -352,6 +385,21 @@ void LevelStraightFall::Kill(BodyObj *obj, char *type)
 		rockCont.push_back(obj);
 		obj->setIsDeleted(false);
 	}
+	else
+	if (type == "aim")
+	{
+		auto it = aimVec.begin();
+		while ((*it ) != obj)
+			it++;
+		
+		aimVec.erase(it);
+		obj->setType(rp3d::STATIC);
+		//obj->setCollisionCategory(EFFECTcat);
+		obj->init(zeroPosition, zeroOrientation);
+		aimCont.push_back(obj);
+		obj->kill();
+		obj->setIsDeleted(false);
+	}
 }
 
 void LevelStraightFall::mapUpdate()
@@ -386,8 +434,15 @@ void LevelStraightFall::mapUpdate()
 		}
 	}
 
-	for (auto *i : aimVec)
-		i->update();
+	for (int i = 0; i<aimVec.size(); i++)
+	{
+		if (aimVec[i]->getIsDeleted())
+			Kill(aimVec[i], "aim");
+		else
+		{
+			aimVec[i]->update();
+		}
+	}
 }
 
 void LevelStraightFall::Draw()
