@@ -23,6 +23,7 @@ public:
 	virtual void init(rp3d::Vector3 position, rp3d::Quaternion orientation);
 	virtual void kill();
 	virtual void setMaxTime(float max);
+	virtual void setPoint(int point);
 
 	rp3d::RigidBody * getBody();
 	rp3d::ProxyShape * getProxyShape();

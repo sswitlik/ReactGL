@@ -38,3 +38,17 @@ void QuaternionO2IToEulerAngles(double *Yaw, double *Pitch, double *Roll, const 
 		*Roll = atan2f(q.x*q.y + q.w*q.z, 0.5f - q.x*q.x - q.z*q.z);
 	}
 }
+
+void DrawString(GLfloat x, GLfloat y, char * string)
+{
+	// po³o¿enie napisu
+	glRasterPos2f(x, y);
+
+	// wyœwietlenie napisu
+	int len = 0;
+	while (string[len] != ';')
+		len++;
+	for (int i = 0; i < len; i++)
+		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
+
+}

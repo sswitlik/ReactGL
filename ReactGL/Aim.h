@@ -7,6 +7,7 @@ class Aim :
 {
 	float lives;
 	std::vector<Arrow *> drilledIn;
+	int points;
 
 public:
 	Aim(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::Vector3 shapeData, rp3d::decimal mass);
@@ -18,4 +19,5 @@ public:
 	void makeCollision(BodyObj *CollideWith);
 	void update();
 	void kill();
+	void setPoint(int x);
 };

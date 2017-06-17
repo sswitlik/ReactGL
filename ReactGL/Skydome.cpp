@@ -19,7 +19,7 @@ void CSkydome::Initialize(void)
 	_displayListId = glGenLists(1);
 
 	int Np = 36;
-	float radius = 20.0f;
+	float radius = 40.0f;
 	
 	glNewList(_displayListId, GL_COMPILE);
 	glBegin(GL_QUAD_STRIP);

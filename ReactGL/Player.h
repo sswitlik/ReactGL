@@ -29,12 +29,14 @@ public:
 	void Draw();
 	void Drawsight(int xcentr, int ycentr);
 	void DrawShootPower(int xcentr, int ysize);
+	void DrawPoints();
 
 	//ATTRIBUTE SETTING
 	void ImproveAccuracy(int plusAccuracy);
 
 	//LEVEL
 	void loadLevel(Level *level);
+	void addPoints(int point);
 
 	//void set();
 	Camera cam;
@@ -42,7 +44,7 @@ public:
 	void unrotate();
 	void stop();
 	void update();
-//private:
+private:
 	//ROTATION
 	float Yaw;
 	float Pitch;
@@ -74,6 +76,7 @@ public:
 
 	//LEVEL
 	Level *level;
+	int points;
 };
 
 

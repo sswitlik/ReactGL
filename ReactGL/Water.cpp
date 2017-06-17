@@ -22,7 +22,7 @@ void Water::Draw()
 
 	if (model)
 	{
-		int jLimit = (LevelLength + 40) / 4;
+		int jLimit = (LevelLength + 80) / 4;
 		glPushMatrix();
 		glScalef(2, 1, 2);
 		//model->Render();

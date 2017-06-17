@@ -4,10 +4,11 @@
 class LevelStraightFall : public Level
 {
 protected:
-	float time;		//from start lavel
+	float time;		//from start level
 	float timer;	//0 - timeHz
 	int toFall;
 	int phase;		//hmany timeHz passed
+	int frontier;	//front of new Rocks
 
 	std::vector<BodyObj *> *map;
 	std::vector<BodyObj *> *objs;

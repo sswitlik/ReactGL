@@ -222,7 +222,7 @@ bool Bitmap::convert8(char* tempData) {
     //allocate the buffer for the final image data
     data=new char[diff];
 
-    //exit if there is not enough memory
+    //if there is not enough memory
     if(data==NULL) {
         error="Not enough memory to allocate an image buffer";
         delete[] data;

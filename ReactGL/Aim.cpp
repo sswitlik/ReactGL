@@ -10,14 +10,14 @@ Aim::Aim(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternio
 {
 	rp3d::Quaternion q(0, 60, 0);
 	initOrientation = q;
-	lives = 2.9;
+	lives = 1.9;
 	setType(rp3d::STATIC);
 }
 
 Aim::Aim(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::CollisionShape *shapeData, rp3d::decimal mass)
 	: BodyObj(world, initPosition, initOrientation, shapeData, mass)
 {
-	lives = 2.9;
+	lives = 1.9;
 	setType(rp3d::STATIC);
 }
 
@@ -87,7 +87,8 @@ void Aim::Draw()
 
 void Aim::kill()
 {
-	for (auto it = drilledIn.begin(); it < drilledIn.end(); it++)
+	int k = 0;
+	for (auto it = drilledIn.begin(); it < drilledIn.end(); )
 	{
 		(*it)->setGravityEnable(true);
 		int x = rand() % 300 - 150,
@@ -96,8 +97,19 @@ void Aim::kill()
 		rp3d::Vector3 force(x, y, z);
 		auto tmpBody = (*it)->getBody();
 		tmpBody->applyForce(force, tmpBody->getTransform().getPosition());
+		it = drilledIn.erase(it);
+		k++;
+	}
+	if (k >= 2)
+	{
+		auto events = game->getEvents();
+		events.ImprovePlayerAccuracy(4);
+		events.addPoints(points);;
 	}
 
-	auto events = game->getEvents();
-	events.ImprovePlayerAccuracy(100);
+}
+
+void Aim::setPoint(int point)
+{
+	points = point;
 }

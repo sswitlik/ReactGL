@@ -10,7 +10,9 @@
 #define PIx2 6.28318530717
 
 const float timeStep = 0.016;
-const int LevelLength = 500;	//lepiej niech bedzie %4
+const int LevelLength = 100;	//lepiej niech bedzie %4
+
+
 
 enum Category {
 	PLAYERcat = 0x0001,
@@ -27,3 +29,6 @@ enum Category {
 void QuaternionO2IToEulerAngles(float *Yaw, float *Pitch, float *Roll, const rp3d::Quaternion &q);
 
 void QuaternionO2IToEulerAngles(double *Yaw, double *Pitch, double *Roll, const rp3d::Quaternion &q);
+
+void DrawString(GLfloat x, GLfloat y, char * string);
+

@@ -110,6 +110,8 @@ void Particle::Draw()
 		//glColor3f(1,1,1);
 		glColor3ub (color.x,color.y,color.z);
 		glutSolidCube(1);
+		glColor3ub(0, 0, 0);
+		glutWireCube(1);
 	glPopMatrix();
 
 }

@@ -10,5 +10,6 @@ public:
 	~Events();
 
 	void ImprovePlayerAccuracy(int plusAccuracy);
+	void addPoints(int point);
 };
 

@@ -17,18 +17,7 @@ int mx, my;
 bool keystate[256];
 //Screen
 int screenHeight = 600, screenWidth = 800;
-
-void DrawString(GLfloat x, GLfloat y, char * string)
-{
-	// po³o¿enie napisu
-	glRasterPos2f(x, y);
-
-	// wyœwietlenie napisu
-	int len = strlen(string);
-	for (int i = 0; i < len; i++)
-		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
-
-}
+int changeScreenHeight = 600, changeScreenWidth = 800;
 
 void Display()
 {
@@ -93,9 +82,9 @@ void Display()
 		//DRAW 2d HERE
 		player->Drawsight(screenWidth / 2, screenHeight / 2);
 		player->DrawShootPower(screenWidth / 2, screenHeight);
+		glColor3ub(0, 0, 0);
+		player->DrawPoints();
 
-		glColor3b(0, 0, 0);
-		DrawString(20, 15, "O======");
 		//
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
@@ -112,6 +101,8 @@ void Display()
 
 void Reshape(int width, int height)
 {
+	changeScreenHeight = height;
+	changeScreenWidth = width;
 	// obszar renderingu - ca³e okno
 	glViewport(0, 0, width, height);
 
@@ -125,7 +116,7 @@ void Reshape(int width, int height)
 		aspect = width / (GLdouble)height;
 
 	// rzutowanie perspektywiczne
-	gluPerspective(90, aspect, 0.1, 60.0);
+	gluPerspective(80, aspect, 0.1, 90.0);
 
 	Display();
 }
@@ -323,9 +314,12 @@ int main(int argc, char * argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(screenWidth, screenHeight);
+
+
 	glutInitWindowPosition(200, 5);
-	glutCreateWindow("LOL");
-	glutSetCursor(GLUT_CURSOR_NONE);
+	glutCreateWindow("Lars the Archer");
+	
+	//glutFullScreen();
 
 	glutDisplayFunc(Display);
 	glutReshapeFunc(Reshape);
@@ -335,7 +329,8 @@ int main(int argc, char * argv[])
 	//MOUSE
 	glutMouseFunc(MouseButton);
 	glutMotionFunc(MouseMotion);
-	glutEntryFunc(EntryFunc);
+	glutSetCursor(GLUT_CURSOR_NONE);
+	//glutEntryFunc(EntryFunc);
 	glutPassiveMotionFunc(MousePassiveMotion);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_DEFAULT);
 	//TIMER
@@ -348,10 +343,7 @@ int main(int argc, char * argv[])
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 	glFogfv(GL_FOG_COLOR, gl_fogcolor);
 	glFogf(GL_FOG_START, 6.0f);
-	glFogf(GL_FOG_END, 24.0f);
-
-	//ANTYALIASING
-	//glEnable(GLUT_MULTISAMPLE);
+	glFogf(GL_FOG_END, 20.0f);
 	
 	//LIGHT
 	glEnable(GL_LIGHTING);
@@ -369,6 +361,7 @@ int main(int argc, char * argv[])
 
 
 	game = new Game();
+
 
 	glutMainLoop();
 	

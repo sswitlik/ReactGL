@@ -5,6 +5,11 @@
 #include "Arrow.h"
 #include "maths.h"
 
+extern int changeScreenHeight;
+extern int changeScreenWidth;
+extern int screenWidth;
+extern int screenHeight;
+
 Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Quaternion initOrientation, rp3d::Vector3 shapeData)
 {
 	world = World;
@@ -54,6 +59,9 @@ Player::Player(rp3d::DynamicsWorld *World, rp3d::Vector3 initPosition, rp3d::Qua
 	//SKYDOME
 	sky = new CSkydome();
 	sky->Initialize();
+
+	//LEVEL
+	points = 0;
 }
 
 void Player::loadLevel(Level *level)
@@ -74,6 +82,19 @@ void Player::update()
 	//cam.set();
 	unrotate();
 	serve_controls();
+
+	static int underwater = 0;
+	if (trans.getPosition().y < 0)
+		underwater++;
+	if (underwater > 200)
+		glutLeaveMainLoop();
+
+	static int levelEnd = 0;
+	if (trans.getPosition().z > LevelLength - 1)
+		levelEnd++;
+	if (underwater > 1000)
+		glutLeaveMainLoop();
+
 }
 
 void Player::set_control(int control)
@@ -482,13 +503,62 @@ void Player::DrawShootPower(int xcentr, int ysize)
 		glVertex2f(xcentr - 100 + nextShotPower/100, ysize - 50);
 		glVertex2f(xcentr - 100 + nextShotPower/100, ysize - 60);
 		
-		//for (int i = 0; i < nextShotPower / 100; i+=10)
-		//{
-		//	glVertex2f(xcentr - 100 + i, ysize - 50);
-		//	glVertex2f(xcentr - 100 + i, ysize - 60);
-		//	
-		//}
 	glEnd();
+
+	glColor4f(0.2f, 0.2f, 0.2f, 0.8);
+	glBegin(GL_QUAD_STRIP);
+		glVertex2f(xcentr - 102, ysize - 48);
+		glVertex2f(xcentr - 102, ysize - 62);
+
+		glVertex2f(xcentr - 100 + nextShotPower/100, ysize - 48);
+		glVertex2f(xcentr - 100 + nextShotPower/100, ysize - 62);
+		
+	glEnd();
+}
+
+void Player::DrawPoints()
+{
+	char p1 = ' ', p2 = ' ', p3 = ' ', p4 = ' ';
+
+	p1 = points / 1000 + 48;
+	p2 = (points / 100) % 10 + 48;
+	p3 = (points / 10) % 10 + 48;
+	p4 = points % 10 + 48;
+
+	char tab[10] = "pkt: ";
+	tab[0] = 'p';
+	tab[1] = 'k';
+	tab[2] = 't';
+	tab[3] = ':';
+	tab[4] = ' ';
+	tab[5] = p1;
+	tab[6] = p2;
+	tab[7] = p3;
+	tab[8] = p4;
+	tab[9] = ';';
+	DrawString(20,20,tab);
+
+	char score[5];
+	score[0] = p1;
+	score[1] = p2;
+	score[2] = p3;
+	score[3] = p4;
+	score[4] = ';';
+
+//game over
+	auto pos = body->getTransform().getPosition();
+	if (pos.y < 0)
+	{
+		glColor3ub(200, 200, 200);
+		DrawString((screenWidth / 2) - 30, screenHeight / 2-50, "YOU LOSE;");
+	}
+	if (pos.z > LevelLength)
+	{
+		glColor3ub(20, 20, 20);
+		DrawString((screenWidth / 2) - 34, screenHeight / 2 - 50, "YOU WIN;");
+		DrawString((screenWidth / 2) - 42, screenHeight / 2 + 60, "YOUR SCORE:;");
+		DrawString((screenWidth / 2) - 22, screenHeight / 2 + 75, score);
+	}
 }
 
 void Player::look_vertical(float angle)
@@ -574,6 +644,8 @@ void Player::ImproveAccuracy(int plusAccuracy)
 		accuracy = 1;
 }
 
-
-
+void Player::addPoints(int point)
+{
+	this->points += point;
+}
 

@@ -12,6 +12,6 @@ public:
 	~Rock();
 	void setMaxTime(float max);
 	void update();
-
+	void init(rp3d::Vector3 position, rp3d::Quaternion orientation);
 };
 

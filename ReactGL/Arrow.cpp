@@ -45,6 +45,8 @@ Arrow::Arrow(rp3d::DynamicsWorld *world, rp3d::Vector3 initPosition, rp3d::Quate
 	IsDeleted = false;
 
 	gameWorld = world;
+
+	time = 0;
 }
 
 
@@ -97,12 +99,13 @@ void Arrow::Draw()
 
 void Arrow::update()
 {
+	time++;
 	////bylo potrzebne przed collision filtering
-	if (time < 3 && !collided) 
-	{
-		time++;		//allow collision after 25
-		return;
-	}
+	//if (time < 3 && !collided) 
+	//{
+	//	time++;		//allow collision after 25
+	//	return;
+	//}
 
 	if (drilled)	
 	{
@@ -157,6 +160,26 @@ void Arrow::update()
 
 		if (speed.y < 0)
 			antivibr = true;
+
+		auto pos = t.getPosition();
+		
+		if (time % 4 == 0 && time >10)
+		{
+			int x = rand() % 90,
+				y = rand() % 90,
+				z = rand() % 90;
+
+			rp3d::Quaternion orient(x, y, z);
+			rp3d::Vector3 col(180, 180, 180);
+			auto partic = game->getLevel()->Make("effect", pos, orient);
+			partic->setCollisionCategory(EFFECTcat);
+			partic->setType(rp3d::STATIC);
+			partic->setMaxTime(30);
+			partic->getColor(col);
+		}
+
+		//camera follow arrow
+		//game->getplayer()->cam.sync(pos, 0, 1, 0);
 	}
 }
 
@@ -226,6 +249,7 @@ void Arrow::init(rp3d::Vector3 position, rp3d::Quaternion orientation)
 	drilled = false;
 	antivibr = false;
 	setCollisionCategory(ARROWcat);
+	time = 0;
 }
 
 void Arrow::setGravityEnable(bool arg)

@@ -19,7 +19,12 @@ void Events::ImprovePlayerAccuracy(int plusAccuracy)
 	player->ImproveAccuracy(plusAccuracy);
 }
 
+void Events::addPoints(int point)
+{
+	Player *player = game->getplayer();
 
+	player->addPoints(point);
+}
 
 
 

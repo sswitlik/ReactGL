@@ -10,6 +10,8 @@ LevelStraightFall::LevelStraightFall()
 	toFall = -3;
 	phase = 0;
 
+	frontier = 12;
+
 	map = NULL;
 	objs = NULL;
 
@@ -22,6 +24,8 @@ LevelStraightFall::LevelStraightFall(rp3d::DynamicsWorld *_world, std::vector<Bo
 	timer = 0;
 	toFall = 0;
 	phase = 0;
+	
+	frontier = 12;
 
 	map = _map;
 	objs = _objs;
@@ -35,82 +39,67 @@ LevelStraightFall::~LevelStraightFall()
 
 void LevelStraightFall::Update(float plusTime)
 {
-	//rp3d::Vector3 v(10, 2, 0);
-	//Make("effect", v, rp3d::Quaternion::identity());
-	printf("%d %d\n", effectVec.size(), effectCont.size());
-
 	mapUpdate();
 
-	float timeHz = 0.4;
+	float timeHz = 0.5;
 	time += plusTime;
 	timer += plusTime;
-
-	
-	if (time < 2)		//3s na rozgrzewke
-		return;
 
 	if (timer < timeHz)		//akcja wykonywana co timeHz
 		return;
 
-	time -= timeHz;
+	timer -= timeHz;
 	phase++;
-
-
-	auto it = objs->begin();
-	if (objs->size() > 0)
-	{
-		while ((*it)->getType() == rp3d::DYNAMIC)
-			it++;
-		for (int i = 0; i < 3; i++)
-		{
-			(*it)->setType(rp3d::DYNAMIC);
-			it++;
-		}
-	}
+//---------------------------------------------------------------------------------
 
 	//initialization temp data
 	rp3d::Vector3 initPosition;
-	rp3d::Quaternion initOrientation;
+	rp3d::Quaternion initOrientation = rp3d::Quaternion::identity();
 	rp3d::Vector3 shapeData;
 
 	//add stones
-	//int frontier = phase + 14;
-	//for (int j = 0; j < 3; j++)
-	//{
-	//	if (j % 2)
-	//		initPosition.setAllValues(j - 1, 3, frontier);
-	//	else
-	//		initPosition.setAllValues(j - 1, 3, frontier + 0.5);
-	//	initOrientation = rp3d::Quaternion::identity();
-	//	shapeData.setAllValues(0.45, 0.3, 0.45);
-	//	auto brick = new BodyObj(world, initPosition, initOrientation, shapeData, 1);
-	//	brick->setType(rp3d::STATIC);
-	//	brick->setMaterial(0, 1);
-	//	brick->setCollisionCategory(FREEcat);
-	//	if (rand() % 2)
-	//		brick->modelInit(Rock1Model);
-	//	else
-	//		brick->modelInit(Rock2Model);
-	//	objs->push_back(brick);
+	if (phase % 1 == 0 && frontier < LevelLength)
+	{
+		frontier++;
+		for (int j = 0; j < 3; j++)
+		{
+			if (j % 2)
+				initPosition.setAllValues(j, 2, frontier);
+			else
+				initPosition.setAllValues(j, 2, frontier + 0.5);
 
-	//}
-		
-
-
-
-	if ((phase + 5) % 10 == 0)	//add aim
-		;
-	//if (toFall >= 0) 
-	//{
-	//	int brickSize = bricks->size();
-	//	if (toFall < brickSize)
-	//		bricks->at(toFall)->setType(rp3d::DYNAMIC);
-	//	if (toFall+1 < brickSize)
-	//		bricks->at(toFall+1)->setType(rp3d::DYNAMIC);
-	//	if (toFall+2 < brickSize)
-	//		bricks->at(toFall+2)->setType(rp3d::DYNAMIC);
-	//}
-	//toFall += 3;
+			auto brick = Make("rock", initPosition, initOrientation);
+			brick->setMaxTime(18);
+			int i = 0;
+		}
+	}
+	//add aims
+	if ((phase + 5) %  4 == 0)	//add aim
+	{
+		int side;
+		if (rand() % 2)
+			side = 1;		//right
+		else
+			side = -1;		//left
+		int distance = rand() % 5 + 8;
+		int height = rand() % 5 + 4;
+		float location = ((float)(rand() % 61) / 10) - 3.0 + phase*2;
+		initPosition.setAllValues(distance * side, height, location);
+		float rotation = rand() % 91;
+		rotation = rotation * PI / 180;
+		BodyObj *obj;
+		if (side == 1)
+		{
+			rp3d::Quaternion aimOrientation(PI_2 + rotation, PI_2, 0);
+			obj = Make("aim", initPosition, aimOrientation);
+		}
+		else
+		{
+			rp3d::Quaternion aimOrientation(PI_2 - rotation, PI_2, 0);
+			obj = Make("aim", initPosition, aimOrientation);
+		}
+		obj->setPoint(distance + height + rotation/5);
+	}
 	
 }
 
@@ -125,17 +114,23 @@ void LevelStraightFall::Initialize()
 	Prepare();
 	rp3d::Vector3 initPosition;
 	rp3d::Quaternion initOrientation = rp3d::Quaternion::identity();
-	rp3d::Quaternion cylinderOrientation(PI_2, 0, 0);
+	rp3d::Quaternion cylinderOrientation(PI_2, PI_2, 0);
 	rp3d::Vector3 shapeData;
 
 	//START
-	for (int i = 0; i < 3; i++)
+	for (int j = 0; j < 11; j++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int i = 0; i < 3; i++)
 		{
-			initPosition.setAllValues(j, 2, i);
+			if (i % 2)
+				initPosition.setAllValues(i, 2, j-1);
+			else
+				initPosition.setAllValues(i, 2, j-1 + 0.5);
 			auto obj = Make("rock", initPosition, initOrientation);
-			obj->setMaxTime(j*2+3);
+			if (j < 3)
+				obj->setMaxTime(j * 2 + 3);
+			else
+				obj->setMaxTime(j*0.4 + 6);
 		}
 	}
 
@@ -151,59 +146,10 @@ void LevelStraightFall::Initialize()
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			initPosition.setAllValues(j + LevelLength, 2, i -1);
+			initPosition.setAllValues( i - 1, 2, j + LevelLength);
 			BodyObj * obj = Make("rock", initPosition, initOrientation);
 		}
 	}
-
-	/*
-	for (int i = 0; i < 16; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			if (j % 2)
-				initPosition.setAllValues(j - 1, 3, i - 1);
-			else
-				initPosition.setAllValues(j - 1, 3, i - 1 + 0.5);
-			initOrientation = rp3d::Quaternion::identity();
-			shapeData.setAllValues(0.45, 0.3, 0.45);
-			auto brick = new BodyObj(world, initPosition, initOrientation, shapeData, 1);
-			brick->setType(rp3d::STATIC);
-			brick->setMaterial(0, 1);
-			brick->setCollisionCategory(FREEcat);
-			if (rand() % 2)
-				brick->modelInit(Rock1Model);
-			else
-				brick->modelInit(Rock2Model);
-			objs->push_back(brick);
-		}
-	}
-
-	initPosition.setAllValues(2, 4, 6);
-	rp3d::Quaternion initOrientRotated(0, 0, PI_2);
-	//shapeData.setAllValues(0.2, 1, 1);
-	auto aim = new Aim(world, initPosition, initOrientRotated, new rp3d::CylinderShape(1, 0.2, 0.1), 1);
-	aim->setType(rp3d::STATIC);
-	aim->setMaterial(0, 1);
-	aim->setCollisionCategory(MAPcat);
-	aim->modelInit(AimBonusModel);
-	map->push_back(aim);
-
-	//META
-	initPosition.setAllValues(0, 3, LevelLength);
-	initOrientation = rp3d::Quaternion::identity();
-	shapeData.setAllValues(2, 0.3, 2);
-	auto meta = new BodyObj(world, initPosition, initOrientation, shapeData, 1);
-	meta->setType(rp3d::STATIC);
-	meta->setMaterial(0, 1);
-	//brick->setCollisionCategory(MAPcat);
-	meta->setCollisionCategory(FREEcat);
-	if (rand() % 2)
-		meta->modelInit(Rock1Model);
-	else
-		meta->modelInit(Rock2Model);
-	objs->push_back(meta);
-	*/
 }
 
 void LevelStraightFall::getModels(Model *rock1, Model *rock2, Model *aimbonus, Model *arrow)
@@ -313,6 +259,7 @@ BodyObj * LevelStraightFall::Make(char *type, rp3d::Vector3 initPosition, rp3d::
 			obj = rockVec.front();
 			obj->init(initPosition, initOrientation);
 			obj->setCollisionCategory(MAPcat);
+
 			rockVec.pop_front();
 			rockVec.push_back(obj);
 		}

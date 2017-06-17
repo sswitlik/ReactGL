@@ -134,7 +134,7 @@ void BodyObj::setCollisionCategory(Category cat)
 		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		this->proxyShape->setCollideWithMaskBits( 0 );
+		this->proxyShape->setCollideWithMaskBits( MAPcat );
 		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);
@@ -159,7 +159,7 @@ void BodyObj::setCollisionCategory(int cat)
 		proxyShape->setCollideWithMaskBits(MAPcat | FREEcat | WATERcat | RUBBISHcat);
 		break;
 	case EFFECTcat:
-		this->proxyShape->setCollideWithMaskBits(0);
+		this->proxyShape->setCollideWithMaskBits(MAPcat);
 		break;
 	case RUBBISHcat:
 		proxyShape->setCollideWithMaskBits(ALLcats);
@@ -298,5 +298,9 @@ rp3d::CollisionShape * BodyObj::getShape()
 }
 
 void BodyObj::getColor(rp3d::Vector3 color)
+{
+}
+
+void BodyObj::setPoint(int point)
 {
 }
